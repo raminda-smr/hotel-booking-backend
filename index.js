@@ -11,6 +11,24 @@ let app = express()
 const JSONParser = bodyParser.json()
 app.use(JSONParser)
 
+// Authorization middleware
+app.use((req,res,next) =>{
+    const token = req.headers("Authorization")?.repalce("Bearer","")
+
+    if(token != null){
+        jwt.verify(token, 'secret',(err,decoded)=>{
+            if(decoded != null){
+                req.user = decoded
+                cosole.log(decoded)
+                next()
+            }
+            else{
+                next()
+            }
+        })
+    }
+})
+
 // Database Connection String
 const connectionString = "mongodb+srv://tester:123@cluster0.kvg7e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 mongoose.connect(connectionString).then(
