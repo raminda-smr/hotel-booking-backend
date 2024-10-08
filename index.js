@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import userRoutes from './routes/userRoutes.js'
+import galleryRoutes from './routes/galleryRoutes.js'
 import mongoose from 'mongoose'
 
 
@@ -24,6 +25,8 @@ mongoose.connect(connectionString).then(
 
 
 app.use('/users', userRoutes)
+
+app.use('/gallery', galleryRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
