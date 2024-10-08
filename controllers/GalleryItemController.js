@@ -1,6 +1,21 @@
 import GalleryItem from "../models/GalleryItem.js";
 
 export function createGalleryItem(req, res) {
+
+    const user = req.user
+
+    if(user == null){
+        res.status(403).json({
+            message: 'Please login to continue'
+        })
+        return
+    }
+    if(user.type != 'admin'){
+        res.status(403).json({
+            message: 'You do not have permission to '
+        })
+        return
+    }
     
     const galleryItem = req.body
 
