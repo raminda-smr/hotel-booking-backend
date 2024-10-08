@@ -7,19 +7,38 @@ const userSchema = mongoose.Schema(
             required: true,
             unique: true
         },
+        password: {
+            type: String,
+            required: true
+        },
+
         firstName: {
-            type: String
+            type: String,
+            required: true
         },
         lastName: {
             type: String
         },
-        img: {
+        type:{
             type: String,
-            default: "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
+            required: true,
+            default: 'customer'
         },
-        password: {
-            type: String,
-            required: true
+        whatsapp:{
+            type:String
+        },
+        phone:{
+            type: String
+        },
+        desabled: {
+            type: Boolean,
+            required: true,
+            default:false
+        },
+        emailVerified: {
+            type:Boolean,
+            required:true,
+            default:false
         }
 
     }
