@@ -1,9 +1,9 @@
 import express from "express"
-import { getUser } from "../controllers/UserController.js"
+import {postUsers} from '../controllers/UserController.js'
 
 let userRoutes = express.Router()
 
-userRoutes.get('/', getUser)
+userRoutes.post('/', postUsers)
 
 
 export default userRoutes
