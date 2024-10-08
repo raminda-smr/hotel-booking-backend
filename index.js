@@ -24,9 +24,9 @@ mongoose.connect(connectionString).then(
 )
 
 
-app.use('/users', userRoutes)
+app.use('/api/users', userRoutes)
 
-app.use('/gallery', galleryRoutes)
+app.use('/api/gallery', galleryRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
