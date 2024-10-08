@@ -1,13 +1,13 @@
 import User from '../models/User.js'
 
 export function getUsers(req, res) {
-  User.find().then(
-      (usersList)=>{
-          res.json({
-              'list': usersList
-          })
-      }
-  )
+    User.find().then(
+        (usersList) => {
+            res.json({
+                'list': usersList
+            })
+        }
+    )
 }
 
 export function postUsers(req, res) {
@@ -15,13 +15,13 @@ export function postUsers(req, res) {
     const user = req.body
     const newUser = new User(user)
     newUser.save().then(
-        ()=>{
+        () => {
             res.json({
                 "messge": "User created!"
             })
         }
     ).catch(
-        ()=>{
+        () => {
             res.json({
                 "messge": "User creation failed"
             })
@@ -31,23 +31,44 @@ export function postUsers(req, res) {
 }
 
 
-export function putUser(req, res){
+export function putUser(req, res) {
     const email = req.body.email
 
-    User.findOneAndUpdate({email:email},
-            {'firstName': req.body.firstName, 'lastName': req.body.lastName }
+    User.findOneAndUpdate({ email: email },
+        { 'firstName': req.body.firstName, 'lastName': req.body.lastName }
     ).then(
-        ()=>{
+        () => {
             res.json({
                 "messge": "User updated!"
             })
         }
     ).catch(
-        ()=>{
+        () => {
             res.json({
                 "messge": "User update failed"
             })
         }
     )
-   
+
+}
+
+
+export function deleteUser(req, res) {
+
+    const email = req.body.email
+
+    User.findOneAndDelete({ email: email }).then(
+        () => {
+            res.json({
+                "messge": "User deleted!"
+            })
+        }
+    ).catch(
+        () => {
+            res.json({
+                "messge": "User delete failed"
+            })
+        }
+    )
+
 }
