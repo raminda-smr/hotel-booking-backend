@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import userRoutes from './routes/userRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 
@@ -58,6 +59,9 @@ mongoose.connect(connectionString).then(
 app.use('/api/users', userRoutes)
 
 app.use('/api/gallery', galleryRoutes)
+
+app.use('/api/categories', categoryRoutes)
+
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
