@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import userRoutes from './routes/userRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
 import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken'
 
 
 // Create a application instance
@@ -14,16 +15,18 @@ app.use(JSONParser)
 // Authorization middleware
 app.use((req,res,next) =>{
 
-    const authorization = req.headers.authorization
+    const tokenAuthorization = req.headers.authorization
     
-    if(authorization){
-        const token = req.headers("Authorization")?.repalce("Bearer","")
+    // Check if authorization available
+    if(tokenAuthorization){
+
+        const token = tokenAuthorization.replace("Bearer ","")
 
         if(token != null){
             jwt.verify(token, 'secret',(err,decoded)=>{
                 if(decoded != null){
                     req.user = decoded
-                    cosole.log(decoded)
+                    console.log(decoded)
                     next()
                 }
                 else{
