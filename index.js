@@ -14,20 +14,29 @@ app.use(JSONParser)
 // Authorization middleware
 app.use((req,res,next) =>{
 
-    const token = req.headers("Authorization")?.repalce("Bearer","")
+    const authorization = req.headers.authorization
+    
+    if(authorization){
+        const token = req.headers("Authorization")?.repalce("Bearer","")
 
-    if(token != null){
-        jwt.verify(token, 'secret',(err,decoded)=>{
-            if(decoded != null){
-                req.user = decoded
-                cosole.log(decoded)
-                next()
-            }
-            else{
-                next()
-            }
-        })
+        if(token != null){
+            jwt.verify(token, 'secret',(err,decoded)=>{
+                if(decoded != null){
+                    req.user = decoded
+                    cosole.log(decoded)
+                    next()
+                }
+                else{
+                    next()
+                }
+            })
+        }
     }
+   
+    // Forward non-authorized tokens to the endpoints
+    next()
+
+
 })
 
 // Database Connection String
