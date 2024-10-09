@@ -1,9 +1,11 @@
 import expres from "express"
 
-import {createGalleryItem} from '../controllers/GalleryItemController.js'
+import {createGalleryItem, getGalleryItems} from '../controllers/GalleryItemController.js'
 
 let galleryRoutes = expres.Router()
 
+
+galleryRoutes.get('/', getGalleryItems)
 
 galleryRoutes.post('/', createGalleryItem)
 

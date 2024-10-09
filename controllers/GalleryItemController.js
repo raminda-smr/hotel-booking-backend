@@ -20,22 +20,33 @@ export function createGalleryItem(req, res) {
     
     const galleryItem = req.body
 
-    console.log(galleryItem)
+    // console.log(galleryItem)
 
     const newGalleryItem = new GalleryItem(galleryItem)
 
     newGalleryItem.save().then(
         () => {
             res.json({
-                message: "Gallery Item Created"
+                "message": "Gallery Item Created"
             })
         }
     ).catch(
         () => {
-            res.status(500).json({
-                message: "Gallery item creation failed"
+            res.json({
+                "messge": "User update failed"
             })
         }
     )
 
+}
+
+
+export function getGalleryItems(req, res) {
+    GalleryItem.find().then(
+        (list) => {
+            res.json({
+                list: list
+            })
+        }
+    )
 }
