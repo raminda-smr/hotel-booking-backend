@@ -13,6 +13,7 @@ app.use(JSONParser)
 
 // Authorization middleware
 app.use((req,res,next) =>{
+
     const token = req.headers("Authorization")?.repalce("Bearer","")
 
     if(token != null){
