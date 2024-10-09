@@ -22,6 +22,8 @@ export function postUsers(req, res) {
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashPassword = bcrypt.hashSync(password,salt)
 
+    user.password = hashPassword
+
     const newUser = new User(user)
     newUser.save().then(
         () => {
@@ -87,9 +89,13 @@ export function deleteUser(req, res) {
 export function loginUser(req,res){
     const credentials = req.body
 
-    User.findOne({ email:credentials.email, password: credentials.password}).then(
+    User.findOne({ email:credentials.email}).then(
         (user)=>{
-            if(user == null){
+
+            const password =  credentials.password
+            const passwordMatched = bcrypt.compare(password, user.password)
+
+            if(!passwordMatched){
                 res.status(403).json({
                     message: "User not found"
                 })

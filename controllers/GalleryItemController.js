@@ -10,10 +10,10 @@ export function createGalleryItem(req, res) {
         })
         return
     }
-    
+
     if(user.type != 'admin'){
         res.status(403).json({
-            message: 'You do not have permission to '
+            message: 'You do not have permission to create a gallery item'
         })
         return
     }
