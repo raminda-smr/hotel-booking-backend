@@ -1,26 +1,11 @@
 import GalleryItem from "../models/GalleryItem.js";
+import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createGalleryItem(req, res) {
 
-    const user = req.user
-
-    if(user == null){
-        res.status(403).json({
-            message: 'Please login to continue'
-        })
-        return
-    }
-
-    if(user.type != 'admin'){
-        res.status(403).json({
-            message: 'You do not have permission to create a gallery item'
-        })
-        return
-    }
+    authenticateAdmin(req, res, "You don't have permission to creaet gallery item")
     
     const galleryItem = req.body
-
-    // console.log(galleryItem)
 
     const newGalleryItem = new GalleryItem(galleryItem)
 
@@ -42,6 +27,7 @@ export function createGalleryItem(req, res) {
 
 
 export function getGalleryItems(req, res) {
+
     GalleryItem.find().then(
         (list) => {
             res.json({
