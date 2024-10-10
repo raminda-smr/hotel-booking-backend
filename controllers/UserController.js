@@ -28,13 +28,13 @@ export function postUsers(req, res) {
     newUser.save().then(
         () => {
             res.json({
-                "messge": "User created!"
+                "message": "User created!"
             })
         }
     ).catch(
         () => {
             res.json({
-                "messge": "User creation failed"
+                "message": "User creation failed"
             })
         }
     )
