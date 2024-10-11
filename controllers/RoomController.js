@@ -3,7 +3,7 @@ import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createRoom(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to create a room")
+    //authenticateAdmin(req, res, "You don't have permission to create a room")
 
     const room = req.body
 
@@ -11,13 +11,15 @@ export function createRoom(req, res) {
 
     newRoom.save().then(
         () => {
+            console.log('saved')
             res.json({
                 "message": "Room Created"
             })
+            return
         }
     ).catch(
-        error => {
-            console.log(error)
+        (err) => {
+            console.log(err)
             res.status(500).json({
                 "message": "Room creation failed"
             })

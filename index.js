@@ -6,6 +6,9 @@ import categoryRoutes from './routes/categoryRoutes.js'
 import roomRoutes from './routes/roomRoutes.js'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 
 // Create a application instance
@@ -28,10 +31,11 @@ app.use((req,res,next) =>{
             jwt.verify(token, 'secret',(err,decoded)=>{
                 if(decoded != null){
                     req.user = decoded
-                    // console.log(decoded)
+                    console.log(decoded)
                     next()
                 }
                 else{
+                    console.log(err)
                     next()
                 }
             })
@@ -45,7 +49,8 @@ app.use((req,res,next) =>{
 })
 
 // Database Connection String
-const connectionString = "mongodb+srv://tester:123@cluster0.kvg7e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const connectionString = process.env.MONGO_URL
+
 mongoose.connect(connectionString).then(
     ()=>{
         console.log('Connnected to the database!')

@@ -3,9 +3,10 @@ import mongoose from "mongoose"
 const RoomSchema = mongoose.Schema({
 
     roomNumber: {
-        type:String,
+        type:Number,
         required: true,
-        unique: true
+        unique: true,
+        min: 1
     },
     category: {
         type: String,
