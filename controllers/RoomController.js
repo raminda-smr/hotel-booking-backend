@@ -16,7 +16,8 @@ export function createRoom(req, res) {
             })
         }
     ).catch(
-        () => {
+        error => {
+            console.log(error)
             res.status(500).json({
                 "message": "Room creation failed"
             })
@@ -28,5 +29,11 @@ export function createRoom(req, res) {
 
 export function getRooms(req, res) {
 
-
+    Room.find().then(
+        (list) => {
+            res.json({
+                list: list
+            })
+        }
+    )
 }
