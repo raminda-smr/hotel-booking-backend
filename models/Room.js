@@ -18,7 +18,6 @@ const RoomSchema = mongoose.Schema({
     maxGuests: {
         type: Number,
         required: true,
-        unique: true,
         min: 1
     },
     disabled: {

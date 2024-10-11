@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import userRoutes from './routes/userRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
+import roomRoutes from './routes/roomRoutes.js'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 
@@ -62,6 +63,7 @@ app.use('/api/gallery', galleryRoutes)
 
 app.use('/api/categories', categoryRoutes)
 
+app.use('/api/rooms', roomRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
