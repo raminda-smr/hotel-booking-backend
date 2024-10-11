@@ -28,7 +28,7 @@ app.use((req,res,next) =>{
         const token = tokenAuthorization.replace("Bearer ","")
 
         if(token != null){
-            jwt.verify(token, 'secret',(err,decoded)=>{
+            jwt.verify(token, process.env.JWT_KEY,(err,decoded)=>{
                 if(decoded != null){
                     req.user = decoded
                     console.log(decoded)
