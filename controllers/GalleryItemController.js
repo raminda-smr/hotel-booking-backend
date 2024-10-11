@@ -17,7 +17,7 @@ export function createGalleryItem(req, res) {
     ).catch(
         () => {
             res.json({
-                "message": "User update failed"
+                "message": "Gallery update failed"
             })
         }
     )

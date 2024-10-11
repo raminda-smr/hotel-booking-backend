@@ -7,14 +7,6 @@ export function postCategory(req, res) {
 
     const category = req.body
 
-    // check if category name available
-    const categoryAvailable = Category.findOne({'name': category.name})
-    if(categoryAvailable){
-        res.json({
-            "message": "Category name '" + category.name + "' already exist in the database"
-        })
-    }
-    
     const newCategory = new Category(category)
 
     newCategory.save().then(
@@ -34,7 +26,7 @@ export function postCategory(req, res) {
 }
 
 
-export function getCategoryList(req, res){
+export function getCategoryList(req, res) {
 
     Category.find().then(
         (list) => {
