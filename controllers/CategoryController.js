@@ -10,21 +10,22 @@ export function postCategory(req, res) {
     const newCategory = new Category(category)
 
     newCategory.save().then(
-        () => {
+        (result) => {
             res.json({
-                "message": "Category created!"
+                "message": "Category created!",
+                "result" : result
             })
         }
     ).catch(
-        () => {
+        (err) => {
             res.json({
-                "message": "Category creation failed"
+                "message": "Category creation failed",
+                "error" :err
             })
         }
     )
 
 }
-
 
 export function getCategoryList(req, res) {
 

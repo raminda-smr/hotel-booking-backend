@@ -15,6 +15,14 @@ const CategorySchema = mongoose.Schema({
         required: true,
         default: 0,
         min: 0
+    },
+    features: [
+        {
+            type: String
+        }
+    ],
+    image: {
+        type: String
     }
 })
 

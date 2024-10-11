@@ -28,18 +28,19 @@ app.use((req,res,next) =>{
         const token = tokenAuthorization.replace("Bearer ","")
 
         if(token != null){
-            jwt.verify(token, process.env.JWT_KEY,(err,decoded)=>{
+            jwt.verify(token, process.env.JWT_KEY ,(err,decoded)=>{
                 if(decoded != null){
                     req.user = decoded
                     console.log(decoded)
-                    next()
+                    // next()
                 }
                 else{
                     console.log(err)
-                    next()
+                    // next()
                 }
             })
         }
+        
     }
    
     // Forward non-authorized tokens to the endpoints
