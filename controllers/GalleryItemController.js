@@ -3,8 +3,7 @@ import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createGalleryItem(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to creaet gallery item")
-    
+    authenticateAdmin(req, res, "You don't have permission to create gallery item")
     const galleryItem = req.body
 
     const newGalleryItem = new GalleryItem(galleryItem)

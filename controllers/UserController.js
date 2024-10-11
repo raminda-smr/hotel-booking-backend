@@ -109,7 +109,7 @@ export function loginUser(req,res){
                     type: user.type
                 }
 
-                const token = jwt.sign(preload, "secret", {expiresIn: "1h"})
+                const token = jwt.sign(preload, "secret", {expiresIn: "48h"})
 
                 res.json({
                     message: "User found",
