@@ -27,6 +27,27 @@ export function postCategory(req, res) {
 
 }
 
+export function deleteCategory(req, res){
+    authenticateAdmin(req, res, "You don't have permission to delete category item")
+
+    const name = req.params.name
+
+    Category.findOneAndDelete({name:name}).then(
+        () => {
+            res.json({
+                "message": "Category deleted!",
+            })
+        }
+    ).catch(
+        () => {
+            res.json({
+                "message": "Category deletation failed!",
+            })
+        }
+    )
+}
+
+
 export function getCategoryList(req, res) {
 
     Category.find().then(

@@ -1,10 +1,12 @@
 import express from "express";
-import {getCategoryList, postCategory} from '../controllers/CategoryController.js'
+import {getCategoryList, postCategory, deleteCategory} from '../controllers/CategoryController.js'
 
 
 let categoryRoutes = express.Router()
 
 categoryRoutes.get('/', getCategoryList)
+
+categoryRoutes.delete('/:name', deleteCategory)
 
 categoryRoutes.post('/', postCategory)
 
