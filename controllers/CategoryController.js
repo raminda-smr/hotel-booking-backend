@@ -88,3 +88,32 @@ export function getCategoryByName(req,res){
     )
 
 }
+
+export function getCategoryByPrice(req,res){
+
+    authenticateAdmin(req, res, "You don't have permission to get category by name")
+
+    const price = req.params.price
+
+    Category.findOne({price:price}).then(
+        (result)=>{
+            if(result == null){
+                req.json({
+                    "message":"Category not found" 
+                })
+            }
+            else{
+                req.json({
+                    category: result
+                })
+            }
+        }
+    ).then(
+        ()=>{
+            req.json({
+                "message" : "Failed to get the category"
+            })
+        }
+    )
+
+}
