@@ -36,3 +36,28 @@ export function getGalleryItems(req, res) {
         }
     )
 }
+
+
+export function deleteGalleryItem(req, res){
+    
+    authenticateAdmin(req, res, "You don't have permission to delete a gallery item")
+
+    const id = req.params.id
+
+    GalleryItem.findOneAndDelete({_id:id}).then(
+        ()=>{
+            res.json({
+                "message": "Gallery item deleted"
+            })
+        }
+    ).catch(
+        (err)=>{
+            if(err != undefined){
+                res.json({
+                    "message": "Gallery item deletation failed"
+                })
+            }
+        }
+    )
+
+}
