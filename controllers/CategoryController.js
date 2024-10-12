@@ -28,6 +28,7 @@ export function postCategory(req, res) {
 }
 
 export function deleteCategory(req, res){
+
     authenticateAdmin(req, res, "You don't have permission to delete category item")
 
     const name = req.params.name
@@ -47,6 +48,38 @@ export function deleteCategory(req, res){
     )
 }
 
+export function updateCategory(req, res){
+
+    authenticateAdmin(req, res, "You don't have permission to update category item")
+
+    const name = req.params.name
+
+    const category = req.body
+
+    // Name cannot be updated
+    category.name = name
+
+
+    Category.findOneAndUpdate({name:name},category ).then(
+        (result) => {
+            if(result){
+                res.json({
+                    "message": "Category updated!",
+                })
+            }
+            
+        }
+    ).catch(
+        (err) => {
+            if(err != undefined){
+                res.json({
+                    "message": "Category update failed!",
+                })
+            }
+        }
+    )
+}
+
 
 export function getCategoryList(req, res) {
 
@@ -62,28 +95,30 @@ export function getCategoryList(req, res) {
 
 export function getCategoryByName(req,res){
 
-    authenticateAdmin(req, res, "You don't have permission to get category by name")
-
     const name = req.params.name
 
     Category.findOne({name:name}).then(
         (result)=>{
             if(result == null){
-                req.json({
+                res.json({
                     "message":"Category not found" 
                 })
             }
             else{
-                req.json({
+                res.json({
                     category: result
                 })
             }
+            return
         }
     ).then(
-        ()=>{
-            req.json({
-                "message" : "Failed to get the category"
-            })
+        (err)=>{
+            if(err != undefined){
+                res.json({
+                    "message" : "Failed to get the category"
+                })
+            }
+            
         }
     )
 
@@ -91,28 +126,31 @@ export function getCategoryByName(req,res){
 
 export function getCategoryByPrice(req,res){
 
-    authenticateAdmin(req, res, "You don't have permission to get category by name")
-
+    
     const price = req.params.price
 
     Category.findOne({price:price}).then(
         (result)=>{
             if(result == null){
-                req.json({
+                res.json({
                     "message":"Category not found" 
                 })
             }
             else{
-                req.json({
+                res.json({
                     category: result
                 })
             }
+            return
         }
     ).then(
-        ()=>{
-            req.json({
-                "message" : "Failed to get the category"
-            })
+        (err)=>{
+            if(err != undefined){
+                res.json({
+                    "message" : "Failed to get the category"
+                })
+            }
+            
         }
     )
 
