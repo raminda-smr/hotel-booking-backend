@@ -31,11 +31,11 @@ app.use((req,res,next) =>{
             jwt.verify(token, process.env.JWT_KEY ,(err,decoded)=>{
                 if(decoded != null){
                     req.user = decoded
-                    console.log(decoded)
+                    // console.log(decoded)
                     // next()
                 }
                 else{
-                    console.log(err)
+                    // console.log(err)
                     // next()
                 }
             })
@@ -43,7 +43,7 @@ app.use((req,res,next) =>{
         
     }
    
-    // Forward non-authorized tokens to the endpoints
+    // Forward request
     next()
 
 

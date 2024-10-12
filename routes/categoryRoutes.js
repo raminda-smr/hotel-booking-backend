@@ -6,8 +6,10 @@ let categoryRoutes = express.Router()
 
 categoryRoutes.get('/', getCategoryList)
 
+categoryRoutes.post('/', postCategory)
+
 categoryRoutes.delete('/:name', deleteCategory)
 
-categoryRoutes.post('/', postCategory)
+
 
 export default categoryRoutes

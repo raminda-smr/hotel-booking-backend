@@ -11,7 +11,7 @@ export function createRoom(req, res) {
 
     newRoom.save().then(
         () => {
-            console.log('saved')
+            // console.log('saved')
             res.json({
                 "message": "Room Created"
             })
@@ -19,7 +19,7 @@ export function createRoom(req, res) {
         }
     ).catch(
         (err) => {
-            console.log(err)
+            // console.log(err)
             res.status(500).json({
                 "message": "Room creation failed"
             })
