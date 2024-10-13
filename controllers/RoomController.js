@@ -75,6 +75,33 @@ export function getRoomByNumber(req, res) {
 }
 
 
+
+export function deleteRoom(req, res) {
+
+    const roomNumber = req.params.roomNumber
+
+    Room.findOneAndDelete({ roomNumber: roomNumber }).then(
+        (result) => {
+            res.json({
+                "message": "Room deleted"
+            })
+        }
+    ).then(
+        (err) => {
+            if (err != undefined) {
+                res.status(500).json({
+                    "message": "Failed to delete the room",
+                    "error":err
+                })
+            }
+
+        }
+    )
+}
+
+
+
+
 export function createRoomImages(req, res) {
 
     authenticateAdmin(req, res, "You don't have permission to create room images")
@@ -145,3 +172,5 @@ export function createRoomImages(req, res) {
             }
         )
 }
+
+
