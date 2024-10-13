@@ -39,3 +39,35 @@ export function getRooms(req, res) {
         }
     )
 }
+
+export function getRoomByNumber(req, res){
+
+    const roomNumber = req.params.roomNumber
+
+    Room.findOne({roomNumber: roomNumber}).then(
+        (result)=>{
+            if(result == null){
+                res.json({
+                    "message":"Room not found" 
+                })
+            }
+            else{
+                res.json({
+                    room: result
+                })
+            }
+            return
+        }
+    ).then(
+        (err)=>{
+            if(err != undefined){
+                res.json({
+                    "message" : "Failed to get the room"
+                })
+            }
+            
+        }
+    )
+
+
+}
