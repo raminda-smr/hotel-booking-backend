@@ -75,6 +75,38 @@ export function getRoomByNumber(req, res) {
 }
 
 
+export function updateRoom(req, res) {
+
+    const room = req.body
+    const roomNumber = req.params.roomNumber
+
+    Room.findOneAndUpdate({ roomNumber: roomNumber }, room).then(
+        (result) => {
+            if (result == null) {
+                res.json({
+                    "message": "Room not found"
+                })
+            }
+            else {
+                res.json({
+                    room: result
+                })
+            }
+            return
+        }
+    ).then(
+        (err) => {
+            if (err != undefined) {
+                res.status(500).json({
+                    "message": "Failed to update the room",
+                    "error":err
+                })
+            }
+
+        }
+    )
+}
+
 
 export function deleteRoom(req, res) {
 
