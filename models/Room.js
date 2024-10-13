@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 const RoomSchema = mongoose.Schema({
 
     roomNumber: {
-        type:Number,
+        type: Number,
         required: true,
         unique: true,
         min: 1

@@ -2,10 +2,10 @@ import mongoose from "mongoose"
 
 const RoomImageSchema = mongoose.Schema({
 
-    roomNumber: {
-        type:Number,
+    roomId: {
+        type:mongoose.Types.ObjectId,
         required: true,
-        min: 1,
+        ref: "Rooms"
     },
     title: {
         type: String
