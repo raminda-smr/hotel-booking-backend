@@ -3,9 +3,10 @@ import mongoose from "mongoose"
 const RoomImageSchema = mongoose.Schema({
 
     roomId: {
-        type:mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: "Rooms"
+        min: 1,
+        ref:"Rooms"
     },
     title: {
         type: String
