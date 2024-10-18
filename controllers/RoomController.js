@@ -44,6 +44,19 @@ export function getRooms(req, res) {
     )
 }
 
+export function getRoomByCategory(req, res) {
+
+    const category = req.params.category
+
+    Room.find({category:category}).then(
+        (list) => {
+            res.json({
+                list: list
+            })
+        }
+    )
+}
+
 export function getRoomByNumber(req, res) {
 
     const roomNumber = req.params.room
