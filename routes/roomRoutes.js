@@ -1,5 +1,5 @@
 import expres from "express"
-import { getRooms, createRoom, getRoomByNumber, createRoomImages, deleteRoom, updateRoom } from "../controllers/RoomController.js"
+import { getRooms, createRoom, getRoomByNumber, addRoomImages, deleteRoom, updateRoom } from "../controllers/RoomController.js"
 
 
 let roomRoutes = expres.Router()
@@ -9,13 +9,13 @@ roomRoutes.get('/', getRooms)
 
 roomRoutes.post('/', createRoom)
 
-roomRoutes.get('/roomNumber/:roomNumber', getRoomByNumber)
+roomRoutes.get('/room-number/:room', getRoomByNumber)
 
-roomRoutes.put('/roomNumber/:roomNumber', updateRoom)
+roomRoutes.put('/room-number/:room', updateRoom)
 
-roomRoutes.delete('/roomNumber/:roomNumber', deleteRoom)
+roomRoutes.delete('/room-number/:room', deleteRoom)
 
-roomRoutes.post('/roomNumber/:roomNumber/images', createRoomImages)
+roomRoutes.post('/room-number/:room/images', addRoomImages)
 
 
 export default roomRoutes

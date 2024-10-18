@@ -26,9 +26,12 @@ const RoomSchema = mongoose.Schema({
         default: false
     },
     images: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"RoomImages"
-    }]
+        type: String
+    }],
+    notes:{
+        type:String,
+        default:""
+    }
 })
 
 const Room = mongoose.model('Rooms', RoomSchema)
