@@ -1,16 +1,16 @@
 export function authenticateAdmin(req,res, message){
 
-    authenticateUser(message, 'admin')
+    authenticateUser(req, res, message, 'admin')
 }
 
 
 export function authenticateCustomer(req,res, message){
 
-    authenticateUser(message, 'customer')
+    authenticateUser(req, res, message, 'customer')
 }
 
 
-function authenticateUser(message, userType){
+function authenticateUser(req, res, message, userType){
     
     const user = req.user
 

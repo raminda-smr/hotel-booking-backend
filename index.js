@@ -7,6 +7,7 @@ import roomRoutes from './routes/roomRoutes.js'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import bookingRoutes from './routes/bookingRoutes.js'
 
 dotenv.config()
 
@@ -70,6 +71,8 @@ app.use('/api/gallery', galleryRoutes)
 app.use('/api/categories', categoryRoutes)
 
 app.use('/api/rooms', roomRoutes)
+
+app.use('/api/bookings', bookingRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
