@@ -1,5 +1,4 @@
 import Room from "../models/Room.js"
-import RoomImage from "../models/RoomImage.js";
 import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createRoom(req, res) {

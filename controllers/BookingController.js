@@ -1,9 +1,9 @@
 import Booking from "../models/Booking.js"
+import {authenticateCustomer} from '../helpers/Authenticate.js'
 
 export function createBooking(req,res){
 
-    authenticateCustomer(req,res, message)
-
+    authenticateCustomer(req,res, "You must login as a customer to create a booking!")
 
     let startingId = 1201
 
@@ -16,10 +16,10 @@ export function createBooking(req,res){
                 const newBooking = new Booking({
                     bookingId: newCount,
                     roomId: req.body.roomId,
-                    email: req.body.email,
+                    email: req.user.email,
+                    phone: req.user.phone,
                     start: req.body.start,
-                    end: req.body.end,
-
+                    end: req.body.end
                 })
 
                 newBooking.save().then(
