@@ -1,5 +1,5 @@
 import Booking from "../models/Booking.js"
-import {authenticateCustomer} from '../helpers/Authenticate.js'
+import {authenticateAdmin, authenticateCustomer} from '../helpers/Authenticate.js'
 
 export function createBooking(req,res){
 
@@ -41,8 +41,6 @@ export function createBooking(req,res){
             }
         }
     )
-
-    return startingId
     
 }
 
@@ -56,4 +54,42 @@ export function getBookings(req, res){
         }
     )
        
+}
+
+
+export function updateBooking(req,res){
+
+    authenticateAdmin(req,res, "You must login as a admin to update a booking!")
+
+    const bookingId = req.params.bookingId
+
+    let booking  = req.body
+
+    booking.bookingId = bookingId
+
+    Booking.findOneAndUpdate({bookingId: bookingId}, booking).then(
+        (result) => {
+            if(result){
+                res.json({
+                    message: "Booking item updated",
+                    result: result
+                })
+            }
+            else{
+                res.status(500).json({
+                    message: "Booking item notfound"
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.status(500).json({
+                    message: "Booking item update failed",
+                    error:err
+                })
+            }
+        }
+    )
+    
 }
