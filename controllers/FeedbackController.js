@@ -39,10 +39,21 @@ export function  createFeedback(req,res){
 
 
 export function  getFeedbacks(req,res){
-    
+
+    Feedback.find().then(
+        (list){
+            res.json({
+                list: list
+            })
+        }
+    )
+
 }
+
 export function  updateFeedback(req,res){
     
+    
+
 }
 
 export function  deleteFeedback(req,res){
