@@ -17,7 +17,7 @@ export function createBooking(req,res){
                     bookingId: newCount,
                     roomId: req.body.roomId,
                     email: req.user.email,
-                    phone: req.user.phone,
+                    phone: req.body.phone,
                     start: req.body.start,
                     end: req.body.end
                 })
@@ -44,4 +44,16 @@ export function createBooking(req,res){
 
     return startingId
     
+}
+
+export function getBookings(req, res){
+
+    Booking.find().then(
+        (list)=>{
+            res.json({
+                list:list
+            })
+        }
+    )
+       
 }
