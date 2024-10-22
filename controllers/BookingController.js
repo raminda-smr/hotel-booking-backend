@@ -93,3 +93,41 @@ export function updateBooking(req,res){
     )
     
 }
+
+
+
+export function deleteBooking(req, res){
+    authenticateAdmin(req,res, "You must login as a admin to update a booking!")
+
+    const bookingId = req.params.bookingId
+
+    const booking = {
+        status : "deleted"
+    }
+
+    Booking.findOneAndUpdate({bookingId: bookingId}, booking).then(
+        (result) => {
+            if(result){
+                res.json({
+                    message: "Booking item deleted",
+                    result: result
+                })
+            }
+            else{
+                res.status(500).json({
+                    message: "Booking item notfound"
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.status(500).json({
+                    message: "Booking item delete failed",
+                    error:err
+                })
+            }
+        }
+    )
+
+}
