@@ -9,12 +9,15 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import bookingRoutes from './routes/bookingRoutes.js'
 import feedbackRoutes from './routes/feedbackRoutes.js'
+import cors from "cors"
 
 dotenv.config()
 
 
 // Create a application instance
 let app = express()
+
+app.use(cors())
 
 const JSONParser = bodyParser.json()
 app.use(JSONParser)

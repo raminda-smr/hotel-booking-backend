@@ -41,7 +41,7 @@ export function  createFeedback(req,res){
 export function  getFeedbacks(req,res){
 
     Feedback.find().then(
-        (list){
+        (list)=> {
             res.json({
                 list: list
             })
@@ -53,6 +53,14 @@ export function  getFeedbacks(req,res){
 export function  updateFeedback(req,res){
     
     
+    authenticateAdmin(req,res, "You must login as a admin to update a feedback!")
+
+    const feedbackId = req.params.feedback
+
+    let feedback  = req.body
+
+   
+
 
 }
 
