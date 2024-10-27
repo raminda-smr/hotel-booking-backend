@@ -34,16 +34,20 @@ export function deleteCategory(req, res){
     const name = req.params.name
 
     Category.findOneAndDelete({name:name}).then(
-        () => {
-            res.json({
-                "message": "Category deleted!",
-            })
+        (res) => {
+            if(res){
+                res.json({
+                    "message": "Category deleted!",
+                })
+            }
         }
     ).catch(
-        () => {
-            res.json({
-                "message": "Category deletation failed!",
-            })
+        (err) => {
+            if(err != undefined){
+                res.json({
+                    "message": "Category deletation failed!",
+                })
+            }
         }
     )
 }

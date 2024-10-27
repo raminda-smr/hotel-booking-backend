@@ -126,7 +126,7 @@ export function loginUser(req,res){
 }
 
 export function getUser(req, res){
-    const user = req.body.user
+    const user = req.user
     
     if(user == null){
         res.json({
