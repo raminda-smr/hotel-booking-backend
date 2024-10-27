@@ -124,3 +124,19 @@ export function loginUser(req,res){
         }
     )
 }
+
+export function getUser(req, res){
+    const user = req.body.user
+    
+    if(user == null){
+        res.json({
+            message: "Not found"
+        })
+    }
+    else{
+        res.json({
+            message: "Found",
+            user: user
+        })
+    }
+}
