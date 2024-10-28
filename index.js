@@ -57,15 +57,13 @@ app.use((req,res,next) =>{
 // Database Connection String
 const connectionString = process.env.MONGO_URL
 
-mongoose.connect(connectionString).then(
-    ()=>{
-        console.log('Connnected to the database!')
-    }
-).catch(
-    ()=> {
-        console.log('Connection to the database is failed!')
-    }
-)
+try{
+    await mongoose.connect(connectionString)
+    console.log('Connnected to the database!')
+}
+catch(e){
+    console.log('Connection to the database is failed!')
+}
 
 
 app.use('/api/users', userRoutes)
