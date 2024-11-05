@@ -6,6 +6,7 @@ export function createGalleryItem(req, res) {
     authenticateAdmin(req, res, "You don't have permission to create gallery item")
 
     const galleryItem = req.body
+    // console.log(galleryItem)
 
     const newGalleryItem = new GalleryItem(galleryItem)
 

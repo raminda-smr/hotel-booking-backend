@@ -3,9 +3,12 @@ import { authenticateAdmin } from '../helpers/Authenticate.js'
 
 export function postCategory(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to creaet category item")
+    authenticateAdmin(req, res, "You don't have permission to create category item")
 
     const category = req.body
+
+    // remove all padding spaces
+    category["name"] = req.body.name.trim()
 
     const newCategory = new Category(category)
 
@@ -18,10 +21,12 @@ export function postCategory(req, res) {
         }
     ).catch(
         (err) => {
-            res.json({
-                "message": "Category creation failed",
-                "error" :err
-            })
+            if(err !=null){
+                res.json({
+                    "message": "Category creation failed",
+                    "error" :err
+                })
+            }
         }
     )
 
@@ -44,7 +49,7 @@ export function deleteCategory(req, res){
     ).catch(
         (err) => {
             if(err != undefined){
-                res.json({
+                res.status(500).json({
                     "message": "Category deletation failed!",
                 })
             }

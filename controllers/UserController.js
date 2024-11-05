@@ -96,6 +96,13 @@ export function loginUser(req,res){
     User.findOne({ email:credentials.email}).then(
         (user)=>{
 
+            if(user == null){
+                res.status(500).json({
+                    message: "User not found",
+                })
+                return 
+            }
+
             const password =  credentials.password
             const passwordMatched = bcrypt.compare(password, user.password)
 
