@@ -38,6 +38,34 @@ export function getGalleryItems(req, res) {
     )
 }
 
+export function updateGalleryItem(req, res){
+    authenticateAdmin(req, res, "You don't have permission to update a gallery item")
+
+    const id = req.params.id
+    const galleryItem = req.body
+
+    GalleryItem.findOneAndUpdate({_id:id},galleryItem ).then(
+        (result) => {
+            if(result){
+                res.json({
+                    "message": "Gallery item updated!",
+                })
+            }
+            
+        }
+    ).catch(
+        (err) => {
+            if(err != undefined){
+                res.json({
+                    "message": "Gallery item update failed!",
+                })
+            }
+        }
+    )
+
+
+}
+
 
 export function deleteGalleryItem(req, res){
     
