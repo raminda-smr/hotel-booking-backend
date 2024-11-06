@@ -1,9 +1,10 @@
-import { authenticateCustomer } from "../helpers/Authenticate.js";
+import { authenticateAdmin, authenticateCustomer } from "../helpers/Authenticate.js";
 import Feedback from "../models/Feedback.js";
+import User from './../models/User.js';
 
-export function  createFeedback(req,res){
+export function createFeedback(req, res) {
 
-    authenticateCustomer(req,res, "You must login as a customer to create a feedback!")
+    authenticateCustomer(req, res, "You must login as a customer to create a feedback!")
 
     const feedback = req.body
 
@@ -11,23 +12,23 @@ export function  createFeedback(req,res){
 
     newFeedback.save().then(
         (result) => {
-            if(result){
+            if (result) {
                 res.json({
-                    message:"Feedback created",
+                    message: "Feedback created",
                     result: result
                 })
             }
-            else{
+            else {
                 res.status(500).json({
-                    message:"Feedback creation failed",
+                    message: "Feedback creation failed",
                 })
             }
         }
     ).catch(
         (err) => {
-            if(err != undefined){
+            if (err != undefined) {
                 res.status(500).json({
-                    message:"Feedback creation failed",
+                    message: "Feedback creation failed",
                     error: err
                 })
             }
@@ -38,10 +39,10 @@ export function  createFeedback(req,res){
 }
 
 
-export function  getFeedbacks(req,res){
+export function getFeedbacks(req, res) {
 
     Feedback.find().then(
-        (list)=> {
+        (list) => {
             res.json({
                 list: list
             })
@@ -50,20 +51,70 @@ export function  getFeedbacks(req,res){
 
 }
 
-export function  updateFeedback(req,res){
-    
-    
-    authenticateAdmin(req,res, "You must login as a admin to update a feedback!")
+export function getFeedbackById(req, res) {
+
+    authenticateAdmin(req, res, "You must login as a admin to view a feedback!")
 
     const feedbackId = req.params.feedback
 
-    let feedback  = req.body
+    Feedback.findOne({ _id: feedbackId }).then(
+        (feedback) => {
 
-   
+            if (feedback) {
+                res.json({
+                    message: "Feedback found",
+                    feedback: feedback,
+                })
+            }
+
+        }
+    ).catch(
+        (err) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Feedback not found",
+                    error: err
+                })
+            }
+        }
+    )
+}
+
+export function updateFeedback(req, res) {
+
+    authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
+
+    const feedbackId = req.params.feedback
+
+    let feedback = req.body
+
+    console.log(feedback)
+    Feedback.findOneAndUpdate({_id: feedbackId}, feedback).then(
+        (result)=>{
+            if(result){
+                res.json({
+                    message: "Feedback updated ",
+                })
+            }
+
+            console.log(result)
+        }
+    ).catch(
+        (err) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Feedback update failed",
+                    error: err
+                })
+            }
+        }
+    )
+
+
 
 
 }
 
-export function  deleteFeedback(req,res){
-    
+export function deleteFeedback(req, res) {
+
 }
