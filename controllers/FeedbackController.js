@@ -88,7 +88,7 @@ export function updateFeedback(req, res) {
 
     let feedback = req.body
 
-    console.log(feedback)
+    // console.log(feedback)
     Feedback.findOneAndUpdate({_id: feedbackId}, feedback).then(
         (result)=>{
             if(result){
@@ -117,4 +117,23 @@ export function updateFeedback(req, res) {
 
 export function deleteFeedback(req, res) {
 
+    authenticateAdmin(req, res, "You must login as a admin to delete a feedback!")
+
+    const feedbackId = req.params.feedback
+
+    Feedback.findOneAndDelete({_id:feedbackId}).then(
+        ()=>{
+            res.json({
+                "message": "Feedback deleted"
+            })
+        }
+    ).catch(
+        (err)=>{
+            if(err != undefined){
+                res.json({
+                    "message": "Feedback deletation failed"
+                })
+            }
+        }
+    )
 }
