@@ -147,3 +147,27 @@ export function getUser(req, res){
         })
     }
 }
+
+
+export function checkEmailExist(req, res){
+
+    const email = req.params.email
+
+    User.findOne({email:email}).then(
+        (user) => {
+            if(user){
+                res.status(500).json({
+                    message: "User already exist",
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.json({
+                    message: "No user found",
+                })
+            }
+        }
+    )
+}

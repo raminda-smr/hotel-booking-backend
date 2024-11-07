@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema(
         phone:{
             type: String
         },
-        desabled: {
+        disabled: {
             type: Boolean,
             required: true,
             default:false

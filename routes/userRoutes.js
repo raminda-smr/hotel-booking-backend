@@ -1,5 +1,5 @@
 import express from "express"
-import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser} from '../controllers/UserController.js'
+import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist} from '../controllers/UserController.js'
 
 let userRoutes = express.Router()
 
@@ -14,5 +14,7 @@ userRoutes.delete('/', deleteUser)
 userRoutes.post('/login', loginUser)
 
 userRoutes.get('/logged', getUser)
+
+userRoutes.get('/check-email-exist/:email', checkEmailExist)
 
 export default userRoutes
