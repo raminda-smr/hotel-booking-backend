@@ -157,7 +157,12 @@ export function checkEmailExist(req, res){
         (user) => {
             if(user){
                 res.status(500).json({
-                    message: "User already exist",
+                    message: "User already exist"
+                })
+            }
+            else{
+                res.json({
+                    message: "No user found"
                 })
             }
         }
@@ -165,7 +170,7 @@ export function checkEmailExist(req, res){
         (err)=>{
             if(err){
                 res.json({
-                    message: "No user found",
+                    message: "No user found"
                 })
             }
         }
