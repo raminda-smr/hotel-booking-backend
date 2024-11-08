@@ -1,15 +1,15 @@
 import Booking from "../models/Booking.js"
-import {authenticateAdmin, authenticateCustomer} from '../helpers/Authenticate.js'
+import { authenticateAdmin, authenticateCustomer } from '../helpers/Authenticate.js'
 
-export function createBooking(req,res){
+export function createBooking(req, res) {
 
-    authenticateCustomer(req,res, "You must login as a customer to create a booking!")
+    authenticateCustomer(req, res, "You must login as a customer to create a booking!")
 
     let startingId = 1201
 
     Booking.countDocuments({}).then(
-        (count) =>{
-            if(count != null){
+        (count) => {
+            if (count != null) {
                 // Get next booking id
                 let newCount = count + startingId;
 
@@ -37,94 +37,123 @@ export function createBooking(req,res){
                         })
                     }
                 )
-                
+
             }
         }
     )
-    
+
 }
 
-export function getBookings(req, res){
+export function getBookings(req, res) {
 
     Booking.find().then(
-        (list)=>{
+        (list) => {
             res.json({
-                list:list
+                list: list
             })
         }
     )
-       
+
 }
 
 
-export function updateBooking(req,res){
+export function updateBooking(req, res) {
 
-    authenticateAdmin(req,res, "You must login as a admin to update a booking!")
+    authenticateAdmin(req, res, "You must login as a admin to update a booking!")
 
     const bookingId = req.params.bookingId
 
-    let booking  = req.body
+    let booking = req.body
 
     booking.bookingId = bookingId
 
-    Booking.findOneAndUpdate({bookingId: bookingId}, booking).then(
+    Booking.findOneAndUpdate({ bookingId: bookingId }, booking).then(
         (result) => {
-            if(result){
+            if (result) {
                 res.json({
                     message: "Booking item updated",
                     result: result
                 })
             }
-            else{
+            else {
                 res.status(500).json({
                     message: "Booking item notfound"
                 })
             }
         }
     ).catch(
-        (err)=>{
-            if(err){
+        (err) => {
+            if (err) {
                 res.status(500).json({
                     message: "Booking item update failed",
-                    error:err
+                    error: err
                 })
             }
         }
     )
-    
+
 }
 
 
 
-export function deleteBooking(req, res){
-    authenticateAdmin(req,res, "You must login as a admin to update a booking!")
+export function deleteBooking(req, res) {
+    authenticateAdmin(req, res, "You must login as a admin to update a booking!")
 
     const bookingId = req.params.bookingId
 
     const booking = {
-        status : "deleted"
+        status: "deleted"
     }
 
-    Booking.findOneAndUpdate({bookingId: bookingId}, booking).then(
+    Booking.findOneAndUpdate({ bookingId: bookingId }, booking).then(
         (result) => {
-            if(result){
+            if (result) {
                 res.json({
                     message: "Booking item deleted",
                     result: result
                 })
             }
-            else{
+            else {
                 res.status(500).json({
                     message: "Booking item notfound"
                 })
             }
         }
     ).catch(
-        (err)=>{
-            if(err){
+        (err) => {
+            if (err) {
                 res.status(500).json({
                     message: "Booking item delete failed",
-                    error:err
+                    error: err
+                })
+            }
+        }
+    )
+
+}
+
+
+export function getBookingById(req, res) {
+
+    authenticateAdmin(req, res, "You must login as a admin to read a booking!")
+
+    const bookingId = req.params.bookingId
+
+    Booking.findOne({ bookingId: bookingId }).then(
+        (booking) => {
+            if (booking) {
+                res.json({
+                    message: "Booking found",
+                    booking: booking
+                })
+            }
+        }
+    ).catch(
+        (err) =>{
+            if(err){
+                res.status(500).json({
+                    message: "Booking not found",
+                    booking: err
                 })
             }
         }
