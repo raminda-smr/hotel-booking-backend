@@ -1,5 +1,5 @@
 import express from "express"
-import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist} from '../controllers/UserController.js'
+import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist, changePassword} from '../controllers/UserController.js'
 
 let userRoutes = express.Router()
 
@@ -7,7 +7,9 @@ userRoutes.get('/', getUsers)
 
 userRoutes.post('/', postUsers)
 
-userRoutes.put('/:email', putUser)
+userRoutes.put('/update/:email', putUser)
+
+userRoutes.put('/change-password/:email', changePassword)
 
 userRoutes.delete('/', deleteUser)
 
