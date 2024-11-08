@@ -47,10 +47,18 @@ export function postUsers(req, res) {
 
 
 export function putUser(req, res) {
-    const email = req.body.email
+    
+    const email = req.params.email
 
     User.findOneAndUpdate({ email: email },
-        { 'firstName': req.body.firstName, 'lastName': req.body.lastName }
+        { 
+            'firstName': req.body.firstName, 
+            'lastName': req.body.lastName, 
+            'whatsapp': req.body.whatsapp, 
+            'phone': req.body.phone, 
+            'disabled': req.body.disabled,
+            'img': req.body.img 
+        }
     ).then(
         () => {
             res.json({

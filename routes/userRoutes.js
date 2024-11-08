@@ -7,7 +7,7 @@ userRoutes.get('/', getUsers)
 
 userRoutes.post('/', postUsers)
 
-userRoutes.put('/', putUser)
+userRoutes.put('/:email', putUser)
 
 userRoutes.delete('/', deleteUser)
 
