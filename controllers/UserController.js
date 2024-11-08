@@ -50,6 +50,8 @@ export function postUsers(req, res) {
 
 export function putUser(req, res) {
 
+    authenticateAdmin(req, res, "You don't have permission to update")
+
     const email = req.params.email
 
     User.findOneAndUpdate({ email: email },
@@ -121,15 +123,14 @@ export function changePassword(req, res) {
             }
         }
     )
-
-
-
 }
 
 
 export function deleteUser(req, res) {
 
-    const email = req.body.email
+    authenticateAdmin(req, res, "You don't have permission to delete user")
+
+    const email = req.params.email
 
     User.findOneAndDelete({ email: email }).then(
         () => {

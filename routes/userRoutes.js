@@ -11,7 +11,7 @@ userRoutes.put('/update/:email', putUser)
 
 userRoutes.put('/change-password/:email', changePassword)
 
-userRoutes.delete('/', deleteUser)
+userRoutes.delete('/:email', deleteUser)
 
 userRoutes.post('/login', loginUser)
 
