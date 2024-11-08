@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import bookingRoutes from './routes/bookingRoutes.js'
 import feedbackRoutes from './routes/feedbackRoutes.js'
+import statsRoutes from './routes/statsRoutes.js'
 import cors from "cors"
 
 dotenv.config()
@@ -77,6 +78,8 @@ app.use('/api/rooms', roomRoutes)
 app.use('/api/bookings', bookingRoutes)
 
 app.use('/api/feedbacks', feedbackRoutes)
+
+app.use('/api/stats', statsRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{
