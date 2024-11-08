@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 
+import {authenticateAdmin} from "../helpers/Authenticate.js"
+
 dotenv.config()
 
 
@@ -24,7 +26,7 @@ export function postUsers(req, res) {
 
     const saltRounds = 10
     const salt = bcrypt.genSaltSync(saltRounds);
-    const hashPassword = bcrypt.hashSync(password,salt)
+    const hashPassword = bcrypt.hashSync(password, salt)
 
     user.password = hashPassword
 
@@ -47,10 +49,20 @@ export function postUsers(req, res) {
 
 
 export function putUser(req, res) {
-    const email = req.body.email
+
+    authenticateAdmin(req, res, "You don't have permission to update")
+
+    const email = req.params.email
 
     User.findOneAndUpdate({ email: email },
-        { 'firstName': req.body.firstName, 'lastName': req.body.lastName }
+        {
+            'firstName': req.body.firstName,
+            'lastName': req.body.lastName,
+            'whatsapp': req.body.whatsapp,
+            'phone': req.body.phone,
+            'disabled': req.body.disabled,
+            'img': req.body.img
+        }
     ).then(
         () => {
             res.json({
@@ -68,9 +80,57 @@ export function putUser(req, res) {
 }
 
 
+export function changePassword(req, res) {
+
+    authenticateAdmin(req, res, "You don't have permission to change password")
+
+    const email = req.params.email
+
+    const credentials = req.body
+
+    User.findOne({ email: email }).then(
+        (user) => {
+
+            if (user == null) {
+                res.status(500).json({
+                    message: "User not found",
+                })
+                return
+            }
+            else {
+
+                const saltRounds = 10
+                const salt = bcrypt.genSaltSync(saltRounds);
+                const hashNewPassword = bcrypt.hashSync(credentials.password, salt)
+
+                User.findOneAndUpdate({ email: email },
+                    {
+                        'password': hashNewPassword,
+                    }
+                ).then(
+                    () => {
+                        res.json({
+                            "messge": "Password changed!"
+                        })
+                    }
+                ).catch(
+                    () => {
+                        res.json({
+                            "messge": "Password update failed"
+                        })
+                    }
+                )
+            }
+        }
+    )
+}
+
+
 export function deleteUser(req, res) {
 
-    const email = req.body.email
+    authenticateAdmin(req, res, "You don't have permission to delete user")
+
+    const email = req.params.email
 
     User.findOneAndDelete({ email: email }).then(
         () => {
@@ -90,28 +150,28 @@ export function deleteUser(req, res) {
 
 
 
-export function loginUser(req,res){
+export function loginUser(req, res) {
     const credentials = req.body
 
-    User.findOne({ email:credentials.email}).then(
-        (user)=>{
+    User.findOne({ email: credentials.email }).then(
+        (user) => {
 
-            if(user == null){
+            if (user == null) {
                 res.status(500).json({
                     message: "User not found",
                 })
-                return 
+                return
             }
 
-            const password =  credentials.password
+            const password = credentials.password
             const passwordMatched = bcrypt.compare(password, user.password)
 
-            if(!passwordMatched){
+            if (!passwordMatched) {
                 res.status(403).json({
                     message: "User not found"
                 })
             }
-            else{
+            else {
                 const preload = {
                     id: user._id,
                     email: user.email,
@@ -120,7 +180,7 @@ export function loginUser(req,res){
                     type: user.type
                 }
 
-                const token = jwt.sign(preload, process.env.JWT_KEY , {expiresIn: "48h"})
+                const token = jwt.sign(preload, process.env.JWT_KEY, { expiresIn: "48h" })
 
                 res.json({
                     message: "User found",
@@ -132,18 +192,47 @@ export function loginUser(req,res){
     )
 }
 
-export function getUser(req, res){
+export function getUser(req, res) {
     const user = req.user
-    
-    if(user == null){
+
+    if (user == null) {
         res.json({
             message: "Not found"
         })
     }
-    else{
+    else {
         res.json({
             message: "Found",
             user: user
         })
     }
+}
+
+
+export function checkEmailExist(req, res) {
+
+    const email = req.params.email
+
+    User.findOne({ email: email }).then(
+        (user) => {
+            if (user) {
+                res.status(500).json({
+                    message: "User already exist"
+                })
+            }
+            else {
+                res.json({
+                    message: "No user found"
+                })
+            }
+        }
+    ).catch(
+        (err) => {
+            if (err) {
+                res.json({
+                    message: "No user found"
+                })
+            }
+        }
+    )
 }
