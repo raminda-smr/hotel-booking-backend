@@ -8,6 +8,8 @@ import { authenticateAdmin } from "../helpers/Authenticate.js"
 
 
 export function getModuleStats(req, res) {
+    
+    authenticateAdmin(req, res, "You must login as a admin to get module data!")
 
     const getModuleData = async () => {
         try {
@@ -45,7 +47,7 @@ export function getModuleStats(req, res) {
 
 export function getDashboardBookingStats(req, res) {
 
-    // authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
 
     const getDashboardBookingData = async () => {
 
