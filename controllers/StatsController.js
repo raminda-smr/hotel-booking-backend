@@ -41,7 +41,9 @@ export function getModuleStats(req, res) {
             res.json(count)
         })
         .catch((error) => {
-            res.status(500).json({ error: "Error fetching module data" })
+            if(error){
+                res.status(500).json({ error: "Error fetching module data" })
+            }
         });
 }
 
