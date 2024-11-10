@@ -4,7 +4,10 @@ import User from './../models/User.js';
 
 export function createFeedback(req, res) {
 
-    authenticateCustomer(req, res, "You must login as a customer to create a feedback!")
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to create a feedback!")
+    if (!authenticated) {
+        return // stop processing
+    }
 
     const feedback = req.body
 
@@ -53,7 +56,10 @@ export function getFeedbacks(req, res) {
 
 export function getFeedbackById(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to view a feedback!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to view a feedback!")
+    if (!authenticated) {
+        return // stop processing
+    }
 
     const feedbackId = req.params.feedback
 
@@ -82,16 +88,19 @@ export function getFeedbackById(req, res) {
 
 export function updateFeedback(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
-
+    const authenticated =  authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
+    if(!authenticated){
+        return // stop processing
+    }
+    
     const feedbackId = req.params.feedback
 
     let feedback = req.body
 
     // console.log(feedback)
-    Feedback.findOneAndUpdate({_id: feedbackId}, feedback).then(
-        (result)=>{
-            if(result){
+    Feedback.findOneAndUpdate({ _id: feedbackId }, feedback).then(
+        (result) => {
+            if (result) {
                 res.json({
                     message: "Feedback updated ",
                 })
@@ -117,19 +126,22 @@ export function updateFeedback(req, res) {
 
 export function deleteFeedback(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to delete a feedback!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to delete a feedback!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const feedbackId = req.params.feedback
 
-    Feedback.findOneAndDelete({_id:feedbackId}).then(
-        ()=>{
+    Feedback.findOneAndDelete({ _id: feedbackId }).then(
+        () => {
             res.json({
                 "message": "Feedback deleted"
             })
         }
     ).catch(
-        (err)=>{
-            if(err != undefined){
+        (err) => {
+            if (err != undefined) {
                 res.json({
                     "message": "Feedback deletation failed"
                 })
