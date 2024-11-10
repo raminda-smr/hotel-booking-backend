@@ -50,7 +50,10 @@ export function postUsers(req, res) {
 
 export function putUser(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to update")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to update")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const email = req.params.email
 
@@ -82,7 +85,10 @@ export function putUser(req, res) {
 
 export function changePassword(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to change password")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to change password")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const email = req.params.email
 
@@ -128,7 +134,10 @@ export function changePassword(req, res) {
 
 export function deleteUser(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to delete user")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to delete user")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const email = req.params.email
 

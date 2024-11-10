@@ -9,7 +9,10 @@ import { authenticateAdmin } from "../helpers/Authenticate.js"
 
 export function getModuleStats(req, res) {
     
-    authenticateAdmin(req, res, "You must login as a admin to get module data!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to get module data!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const getModuleData = async () => {
         try {
@@ -38,16 +41,23 @@ export function getModuleStats(req, res) {
 
     getModuleData()
         .then((count) => {
-            res.json(count)
+            if(count){
+                res.json(count)
+            }
         })
         .catch((error) => {
-            res.status(500).json({ error: "Error fetching module data" })
+            if(error){
+                res.status(500).json({ error: "Error fetching module data" })
+            }
         });
 }
 
 export function getDashboardBookingStats(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const getDashboardBookingData = async () => {
 
@@ -124,7 +134,9 @@ export function getDashboardBookingStats(req, res) {
 
     getDashboardBookingData()
         .then((data) => {
-            res.json(data)
+            if(data){
+                res.json(data)
+            }
         })
         .catch((error) => {
             if (error) {

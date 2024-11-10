@@ -3,7 +3,10 @@ import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createRoom(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to create a room")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to create a room")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const room = req.body
 
@@ -89,6 +92,11 @@ export function getRoomByNumber(req, res) {
 
 export function updateRoom(req, res) {
 
+    const authenticated = authenticateAdmin(req, res, "You must login as admin to update rooms")
+    if(!authenticated){
+        return // stop processing
+    }
+
     const room = req.body
     const roomNumber = req.params.room
 
@@ -124,6 +132,11 @@ export function updateRoom(req, res) {
 
 export function deleteRoom(req, res) {
 
+    const authenticated = authenticateAdmin(req, res, "You must login as admin to delete a room")
+    if(!authenticated){
+        return // stop processing
+    }
+
     const roomNumber = req.params.room
 
     Room.findOneAndDelete({ roomNumber: roomNumber }).then(
@@ -149,7 +162,10 @@ export function deleteRoom(req, res) {
 
 export function addRoomImages(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to create room images")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to create room images")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const roomImage = req.body
     const roomNumber = req.params.room
