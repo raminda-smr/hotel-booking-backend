@@ -186,7 +186,8 @@ export function loginUser(req, res) {
                     email: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    type: user.type
+                    type: user.type,
+                    image: user.img
                 }
 
                 const token = jwt.sign(preload, process.env.JWT_KEY, { expiresIn: "48h" })
