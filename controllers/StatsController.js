@@ -51,7 +51,7 @@ export function getModuleStats(req, res) {
 
 export function getDashboardBookingStats(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    // authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
 
     const getDashboardBookingData = async () => {
 
@@ -128,7 +128,9 @@ export function getDashboardBookingStats(req, res) {
 
     getDashboardBookingData()
         .then((data) => {
-            res.json(data)
+            if(data){
+                res.json(data)
+            }
         })
         .catch((error) => {
             if (error) {
