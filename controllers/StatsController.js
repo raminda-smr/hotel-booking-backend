@@ -38,7 +38,9 @@ export function getModuleStats(req, res) {
 
     getModuleData()
         .then((count) => {
-            res.json(count)
+            if(count){
+                res.json(count)
+            }
         })
         .catch((error) => {
             if(error){
