@@ -3,7 +3,10 @@ import { authenticateAdmin } from "../helpers/Authenticate.js";
 
 export function createGalleryItem(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to create gallery item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to create gallery item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const galleryItem = req.body
     // console.log(galleryItem)
@@ -39,7 +42,10 @@ export function getGalleryItems(req, res) {
 }
 
 export function updateGalleryItem(req, res){
-    authenticateAdmin(req, res, "You don't have permission to update a gallery item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to update a gallery item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const id = req.params.id
     const galleryItem = req.body
@@ -69,7 +75,10 @@ export function updateGalleryItem(req, res){
 
 export function deleteGalleryItem(req, res){
     
-    authenticateAdmin(req, res, "You don't have permission to delete a gallery item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to delete a gallery item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const id = req.params.id
 
