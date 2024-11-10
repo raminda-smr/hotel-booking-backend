@@ -3,7 +3,10 @@ import { authenticateAdmin } from '../helpers/Authenticate.js'
 
 export function postCategory(req, res) {
 
-    authenticateAdmin(req, res, "You don't have permission to create category item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to create category item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const category = req.body
 
@@ -34,7 +37,10 @@ export function postCategory(req, res) {
 
 export function deleteCategory(req, res){
 
-    authenticateAdmin(req, res, "You don't have permission to delete category item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to delete category item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const name = req.params.name
 
@@ -59,7 +65,10 @@ export function deleteCategory(req, res){
 
 export function updateCategory(req, res){
 
-    authenticateAdmin(req, res, "You don't have permission to update category item")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to update category item")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const name = req.params.name
 
