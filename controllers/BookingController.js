@@ -3,7 +3,10 @@ import { authenticateAdmin, authenticateCustomer } from '../helpers/Authenticate
 
 export function createBooking(req, res) {
 
-    authenticateCustomer(req, res, "You must login as a customer to create a booking!")
+    const authenticated =  authenticateCustomer(req, res, "You must login as a customer to create a booking!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     let startingId = 1201
 
@@ -59,7 +62,10 @@ export function getBookings(req, res) {
 
 export function updateBooking(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to update a booking!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to update a booking!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const bookingId = req.params.bookingId
 
@@ -97,7 +103,10 @@ export function updateBooking(req, res) {
 
 
 export function deleteBooking(req, res) {
-    authenticateAdmin(req, res, "You must login as a admin to update a booking!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to update a booking!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const bookingId = req.params.bookingId
 
@@ -135,8 +144,11 @@ export function deleteBooking(req, res) {
 
 export function getBookingById(req, res) {
 
-    authenticateAdmin(req, res, "You must login as a admin to read a booking!")
-
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to read a booking!")
+    if(!authenticated){
+        return // stop processing
+    }
+    
     const bookingId = req.params.bookingId
 
     Booking.findOne({ bookingId: bookingId }).then(
