@@ -9,7 +9,10 @@ import { authenticateAdmin } from "../helpers/Authenticate.js"
 
 export function getModuleStats(req, res) {
     
-    authenticateAdmin(req, res, "You must login as a admin to get module data!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to get module data!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const getModuleData = async () => {
         try {
@@ -51,7 +54,10 @@ export function getModuleStats(req, res) {
 
 export function getDashboardBookingStats(req, res) {
 
-    // authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to get dashboard data!")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const getDashboardBookingData = async () => {
 
