@@ -206,7 +206,7 @@ export function getUser(req, res) {
     const user = req.user
 
     if (user == null) {
-        res.json({
+        res.status(500).json({
             message: "Not found"
         })
     }
