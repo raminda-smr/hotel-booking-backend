@@ -82,7 +82,7 @@ export function registerUser(req, res) {
                         { expiresIn: "1h" }       // Token expires in 1 hour
                     );
 
-                    const verificationLink = `${req.protocol}://${req.get("host")}/api/users/verify/${token}`;
+                    const verificationLink = `${process.env.CLIENT_APP_URL}/verify/${token}`;
                     return sendVerificationEmail(savedUser.email, verificationLink);
 
                 }
