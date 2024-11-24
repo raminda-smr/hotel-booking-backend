@@ -1,11 +1,13 @@
 import express from "express"
-import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist, changePassword} from '../controllers/UserController.js'
+import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist, changePassword, registerUser} from '../controllers/UserController.js'
 
 let userRoutes = express.Router()
 
 userRoutes.get('/', getUsers)
 
 userRoutes.post('/', postUsers)
+
+userRoutes.post('/register', registerUser)
 
 userRoutes.put('/update/:email', putUser)
 
