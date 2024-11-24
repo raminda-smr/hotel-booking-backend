@@ -18,11 +18,7 @@ export function getUsers(req, res) {
     )
 }
 
-function encryptPassword(password){
-    const saltRounds = 10
-    const salt = bcrypt.genSaltSync(saltRounds);
-    return bcrypt.hashSync(password, salt)
-}
+
 
 export function postUsers(req, res) {
 
@@ -278,3 +274,18 @@ export function checkEmailExist(req, res) {
         }
     )
 }
+
+
+
+
+/* ----------------------------------------- */
+/* ---------- SUPPORT FUNCTIONS ------------ */
+/* ----------------------------------------- */
+
+function encryptPassword(password){
+    const saltRounds = 10
+    const salt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(password, salt)
+}
+
+
