@@ -333,4 +333,30 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+function sendVerificationEmail(email, verificationLink) {
 
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify Your Email",
+        html: `<p>Click the link below to verify your email:</p>
+               <a href="${verificationLink}">${verificationLink}</a>`,
+    };
+
+    return transporter.sendMail(mailOptions)
+        .then(info => {
+            console.log("Verification email sent:", info.response);
+        })
+        .catch(err => {
+            console.error("Error sending email:", err);
+            throw new Error("Failed to send verification email");
+        });
+}
