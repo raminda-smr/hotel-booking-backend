@@ -2,8 +2,9 @@ import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
+import nodemailer from "nodemailer";
 
-import {authenticateAdmin} from "../helpers/Authenticate.js"
+import { authenticateAdmin } from "../helpers/Authenticate.js"
 
 dotenv.config()
 
@@ -23,7 +24,7 @@ export function getUsers(req, res) {
 export function postUsers(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to create user")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -49,29 +50,68 @@ export function postUsers(req, res) {
 }
 
 
-export function registerUser(){
+export function registerUser(req, res) {
 
     const user = req.body
 
-    user.password = encryptPassword(user.password)
-    
-    // stop user type exploitation
-    user.type = 'customer';
+    // Validate email format
+    if (!isValidEmail(user.email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+    }
 
-    const newUser = new User(user)
-    newUser.save().then(
-        () => {
-            res.json({
-                "message": "User created!"
+    // Check if email already exists
+    User.findOne({ email: user.email }).then(
+        (existingUser) => {
+            if (existingUser) {
+                return Promise.reject({ status: 400, message: "Email already registered" });
+            }
+
+            user.password = encryptPassword(user.password)
+
+            // limit user type
+            user.type = 'customer'
+            user.emailVerified = false
+
+            const newUser = new User(user)
+            newUser.save().then(
+                (savedUser) => {
+                    // Generate a verification token
+                    const token = jwt.sign(
+                        { userId: savedUser._id }, // Payload contains user ID
+                        process.env.JWT_KEY,   // Secret key
+                        { expiresIn: "1h" }       // Token expires in 1 hour
+                    );
+
+                    const verificationLink = `${req.protocol}://${req.get("host")}/api/users/verify/${token}`;
+                    return sendVerificationEmail(savedUser.email, verificationLink);
+
+                }
+            )
+            .then(()=>{
+                return res.status(201).json({ message: "User created! Please verify your email." });
             })
+            .catch(
+                (error) => {
+                    if (error.status) {
+                        res.status(error.status).json({ message: error.message });
+                    } else {
+                        console.error(error);
+                        res.status(500).json({ message: "User creation failed", error });
+                    }
+                }
+            )
         }
     ).catch(
-        () => {
-            res.json({
-                "message": "User creation failed"
-            })
+        (error) => {
+            res.status(500).json({ message: "User creation failed", error });
         }
     )
+
+
+
+
+
+
 }
 
 
@@ -79,7 +119,7 @@ export function registerUser(){
 export function putUser(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to update user")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -114,7 +154,7 @@ export function putUser(req, res) {
 export function changePassword(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to change password")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -163,7 +203,7 @@ export function changePassword(req, res) {
 export function deleteUser(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to delete user")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -282,10 +322,15 @@ export function checkEmailExist(req, res) {
 /* ---------- SUPPORT FUNCTIONS ------------ */
 /* ----------------------------------------- */
 
-function encryptPassword(password){
+function encryptPassword(password) {
     const saltRounds = 10
     const salt = bcrypt.genSaltSync(saltRounds);
     return bcrypt.hashSync(password, salt)
+}
+
+function isValidEmail(email) {
+    const emailRegex = /\S+@\S+\.\S+/;
+    return emailRegex.test(email);
 }
 
 
