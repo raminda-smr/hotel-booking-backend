@@ -18,17 +18,22 @@ export function getUsers(req, res) {
     )
 }
 
+function encryptPassword(password){
+    const saltRounds = 10
+    const salt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(password, salt)
+}
+
 export function postUsers(req, res) {
+
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to create user")
+    if(!authenticated){
+        return // stop processing
+    }
 
     const user = req.body
 
-    const password = user.password
-
-    const saltRounds = 10
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hashPassword = bcrypt.hashSync(password, salt)
-
-    user.password = hashPassword
+    user.password = encryptPassword(user.password)
 
     const newUser = new User(user)
     newUser.save().then(
@@ -48,9 +53,36 @@ export function postUsers(req, res) {
 }
 
 
+export function registerUser(){
+
+    const user = req.body
+
+    user.password = encryptPassword(user.password)
+    
+    // stop user type exploitation
+    user.type = 'customer';
+
+    const newUser = new User(user)
+    newUser.save().then(
+        () => {
+            res.json({
+                "message": "User created!"
+            })
+        }
+    ).catch(
+        () => {
+            res.json({
+                "message": "User creation failed"
+            })
+        }
+    )
+}
+
+
+
 export function putUser(req, res) {
 
-    const authenticated = authenticateAdmin(req, res, "You don't have permission to update")
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to update user")
     if(!authenticated){
         return // stop processing
     }
