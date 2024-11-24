@@ -316,6 +316,46 @@ export function checkEmailExist(req, res) {
 }
 
 
+export function verifyUser(req, res) {
+    const { token } = req.params;
+
+    // Verify the JWT token
+    jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+        if (err) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        // Extract the user ID from the decoded token
+        const userId = decoded.userId;
+
+        // Find the user by ID and update verification status
+        User.findById(userId)
+            .then(user => {
+                if (!user) {
+                    return Promise.reject({ status: 404, message: "User not found" });
+                }
+
+                if (user.emailVerified) {
+                    return Promise.reject({ status: 400, message: "User already verified" });
+                }
+
+                user.emailVerified = true;
+                return user.save();
+            })
+            .then(() => {
+                res.status(200).json({ message: "Email successfully verified!" });
+            })
+            .catch(error => {
+                if (error.status) {
+                    res.status(error.status).json({ message: error.message });
+                } else {
+                    console.error(error);
+                    res.status(500).json({ message: "Verification failed", error });
+                }
+            });
+    });
+}
+
 
 
 /* ----------------------------------------- */
