@@ -235,12 +235,28 @@ export function loginUser(req, res) {
                 return
             }
 
+            if(user.disabled){
+                res.status(403).json({
+                    message: "User not found"
+                })
+                return
+            }
+
+            if(user.emailVerified == false){
+                res.status(402).json({
+                    message: "User not verified",
+                })
+                return
+            }
+
+
+
             const password = credentials.password
             const passwordMatched = bcrypt.compare(password, user.password)
 
             if (!passwordMatched) {
                 res.status(403).json({
-                    message: "User not found"
+                    message: "Password missmatched!"
                 })
             }
             else {
