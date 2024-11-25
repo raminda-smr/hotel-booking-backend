@@ -87,30 +87,25 @@ export function registerUser(req, res) {
 
                 }
             )
-            .then(()=>{
-                return res.status(201).json({ message: "User created! Please verify your email." });
-            })
-            .catch(
-                (error) => {
-                    if (error.status) {
-                        res.status(error.status).json({ message: error.message });
-                    } else {
-                        console.error(error);
-                        res.status(500).json({ message: "User creation failed", error });
+                .then(() => {
+                    return res.status(201).json({ message: "User created! Please verify your email." });
+                })
+                .catch(
+                    (error) => {
+                        if (error.status) {
+                            res.status(error.status).json({ message: error.message });
+                        } else {
+                            console.error(error);
+                            res.status(500).json({ message: "User creation failed", error });
+                        }
                     }
-                }
-            )
+                )
         }
     ).catch(
         (error) => {
             res.status(500).json({ message: "User creation failed", error });
         }
     )
-
-
-
-
-
 
 }
 
@@ -356,6 +351,55 @@ export function verifyUser(req, res) {
     });
 }
 
+
+export function requestVerification(req, res) {
+
+    const user = req.body
+
+    console.log(user);
+
+    // Validate email format
+    if (!isValidEmail(user.email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Check if email already exists
+    User.findOne({ email: user.email }).then(
+        (existingUser) => {
+
+
+            if (existingUser && existingUser.emailVerified == false) {
+
+                const token = jwt.sign(
+                    { userId: existingUser._id }, // Payload contains user ID
+                    process.env.JWT_KEY,   // Secret key
+                    { expiresIn: "1h" }       // Token expires in 1 hour
+                );
+
+                const verificationLink = `${process.env.CLIENT_APP_URL}/verify/${token}`;
+
+                sendVerificationEmail(existingUser.email, verificationLink).then(
+                    (result) => {
+                        return res.json({ message: "Email sent successfully." })
+                    }
+                ).catch(
+                    (error) => {
+                        return res.status(error.status).json({ message: "Email sending failed.", error: error.message })
+                    }
+                )
+            }
+            else {
+                return res.status(500).json({ message: "User verified" });
+            }
+        }
+    ).catch(
+        (error) => {
+            if (error) {
+                res.status(500).json({ message: "User not found" });
+            }
+        }
+    )
+}
 
 
 /* ----------------------------------------- */
