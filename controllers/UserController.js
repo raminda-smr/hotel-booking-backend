@@ -19,8 +19,6 @@ export function getUsers(req, res) {
     )
 }
 
-
-
 export function postUsers(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to create user")
@@ -48,7 +46,6 @@ export function postUsers(req, res) {
     )
 
 }
-
 
 export function registerUser(req, res) {
 
@@ -109,8 +106,6 @@ export function registerUser(req, res) {
 
 }
 
-
-
 export function putUser(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to update user")
@@ -145,7 +140,6 @@ export function putUser(req, res) {
 
 }
 
-
 export function changePassword(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to change password")
@@ -168,9 +162,8 @@ export function changePassword(req, res) {
             }
             else {
 
-                const saltRounds = 10
-                const salt = bcrypt.genSaltSync(saltRounds);
-                const hashNewPassword = bcrypt.hashSync(credentials.password, salt)
+
+                const hashNewPassword = encryptPassword(credentials.password)
 
                 User.findOneAndUpdate({ email: email },
                     {
@@ -193,7 +186,6 @@ export function changePassword(req, res) {
         }
     )
 }
-
 
 export function deleteUser(req, res) {
 
@@ -220,8 +212,6 @@ export function deleteUser(req, res) {
 
 }
 
-
-
 export function loginUser(req, res) {
     const credentials = req.body
 
@@ -235,14 +225,14 @@ export function loginUser(req, res) {
                 return
             }
 
-            if(user.disabled){
+            if (user.disabled) {
                 res.status(403).json({
                     message: "User not found"
                 })
                 return
             }
 
-            if(user.emailVerified == false){
+            if (user.emailVerified == false) {
                 res.status(402).json({
                     message: "User not verified",
                 })
@@ -297,7 +287,6 @@ export function getUser(req, res) {
     }
 }
 
-
 export function checkEmailExist(req, res) {
 
     const email = req.params.email
@@ -325,7 +314,6 @@ export function checkEmailExist(req, res) {
         }
     )
 }
-
 
 export function verifyUser(req, res) {
     const { token } = req.params;
@@ -366,7 +354,6 @@ export function verifyUser(req, res) {
             });
     });
 }
-
 
 export function requestVerification(req, res) {
 
@@ -417,6 +404,42 @@ export function requestVerification(req, res) {
     )
 }
 
+export function requestPasswordResetLink(req, res) {
+    const { email } = req.body
+
+    User.findOne({ email:email, emailVerified:true, disabled:false }).then(
+        (user) => {
+
+            if (!user) {
+                return res.status(500).json({ message: "User not found" });
+            }
+
+            // Generate a JWT token
+            const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: process.env.RESET_TOKEN_EXPIRY });
+
+            const resetLink = `http://your-domain.com/reset-password?token=${token}`;
+
+            sendPasswordResetEmail(email, resetLink).then(
+                (result) => {
+                    return res.json({ message: "Email sent successfully." })
+                }
+            ).catch(
+                (error) => {
+                    return res.status(error.status).json({ message: "Email sending failed.", error: error.message })
+                }
+            )
+           
+        }
+    ).catch(
+        (error) => {
+            if (error) {
+                res.status(500).json({ message: "User not found" });
+            }
+        }
+    )
+
+}
+
 
 /* ----------------------------------------- */
 /* ---------- SUPPORT FUNCTIONS ------------ */
@@ -460,3 +483,34 @@ function sendVerificationEmail(email, verificationLink) {
             throw new Error("Failed to send verification email");
         });
 }
+
+function sendPasswordResetEmail(email, verificationLink) {
+
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Reset Your password",
+        html: `<p>Click the link below to reset your password:</p>
+               <a href="${verificationLink}">${verificationLink}</a>`,
+    };
+
+    return transporter.sendMail(mailOptions)
+        .then(info => {
+            console.log("Verification email sent:", info.response);
+        })
+        .catch(err => {
+            console.error("Error sending email:", err);
+            throw new Error("Failed to send verification email");
+        });
+}
+
+
+
