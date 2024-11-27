@@ -115,6 +115,14 @@ export function putUser(req, res) {
 
     const email = req.params.email
 
+    const protectedEmails = ['admin@email.com', 'customer@email.com'];
+    
+    if (protectedEmails.includes(email)) {
+        return res.status(403).json({
+            message: "This account is protected and cannot be updated."
+        });
+    }
+
     User.findOneAndUpdate({ email: email },
         {
             'firstName': req.body.firstName,
@@ -149,6 +157,14 @@ export function changePassword(req, res) {
 
     const email = req.params.email
 
+    const protectedEmails = ['admin@email.com', 'customer@email.com'];
+    
+    if (protectedEmails.includes(email)) {
+        return res.status(403).json({
+            message: "This account is protected and cannot be password changed."
+        });
+    }
+
     const credentials = req.body
 
     User.findOne({ email: email }).then(
@@ -161,7 +177,6 @@ export function changePassword(req, res) {
                 return
             }
             else {
-
 
                 const hashNewPassword = encryptPassword(credentials.password)
 
@@ -196,16 +211,25 @@ export function deleteUser(req, res) {
 
     const email = req.params.email
 
+    const protectedEmails = ['admin@email.com', 'customer@email.com'];
+
+    if (protectedEmails.includes(email)) {
+        return res.status(403).json({
+            message: "This account is protected and cannot be deleted."
+        });
+    }
+
+
     User.findOneAndDelete({ email: email }).then(
         () => {
             res.json({
-                "messge": "User deleted!"
+                "message": "User deleted!"
             })
         }
     ).catch(
         () => {
-            res.json({
-                "messge": "User delete failed"
+            res.status(500).json({
+                message: "User delete failed"
             })
         }
     )
