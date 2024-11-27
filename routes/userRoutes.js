@@ -1,5 +1,5 @@
 import express from "express"
-import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist, changePassword, registerUser, verifyUser, requestVerification, requestPasswordResetLink} from '../controllers/UserController.js'
+import {getUsers, postUsers, putUser, deleteUser, loginUser, getUser, checkEmailExist, changePassword, registerUser, verifyUser, requestVerification, requestPasswordResetLink, resetPassword} from '../controllers/UserController.js'
 
 let userRoutes = express.Router()
 
@@ -26,5 +26,7 @@ userRoutes.get("/verify/:token", verifyUser);
 userRoutes.post("/request-verification", requestVerification);
 
 userRoutes.post("/request-password-reset", requestPasswordResetLink);
+
+userRoutes.post("/reset-password", resetPassword);
 
 export default userRoutes

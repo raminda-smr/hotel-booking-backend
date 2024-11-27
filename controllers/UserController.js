@@ -405,9 +405,12 @@ export function requestVerification(req, res) {
 }
 
 export function requestPasswordResetLink(req, res) {
+
     const { email } = req.body
 
-    User.findOne({ email:email, emailVerified:true, disabled:false }).then(
+
+
+    User.findOne({ email: email, emailVerified: true, disabled: false }).then(
         (user) => {
 
             if (!user) {
@@ -415,9 +418,9 @@ export function requestPasswordResetLink(req, res) {
             }
 
             // Generate a JWT token
-            const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: process.env.RESET_TOKEN_EXPIRY });
+            const token = jwt.sign({ email }, process.env.JWT_KEY, { expiresIn: process.env.RESET_TOKEN_EXPIRY });
 
-            const resetLink = `http://your-domain.com/reset-password?token=${token}`;
+            const resetLink = process.env.CLIENT_APP_URL + `/set-new-password/${token}`;
 
             sendPasswordResetEmail(email, resetLink).then(
                 (result) => {
@@ -428,7 +431,7 @@ export function requestPasswordResetLink(req, res) {
                     return res.status(error.status).json({ message: "Email sending failed.", error: error.message })
                 }
             )
-           
+
         }
     ).catch(
         (error) => {
@@ -438,6 +441,60 @@ export function requestPasswordResetLink(req, res) {
         }
     )
 
+}
+
+
+export function resetPassword(req, res) {
+    const { token, password } = req.body
+
+    if (token.length > 0 && password.length > 6) {
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+        User.findOne({ email: decoded.email, emailVerified: true })
+            .then(
+                (user) => {
+                    if (user) {
+                        if (user.disabled == true) {
+                            res.status(500).json({ message: 'User disabled. Please contact an admin.' })
+                        }
+                        else {
+
+                            const hashNewPassword = encryptPassword(credentials.password)
+
+                            User.findOneAndUpdate({ email: decoded.email },
+                                {'password': hashNewPassword}
+                            ).then(
+                                () => {
+                                    res.json({
+                                        "messge": "Password changed!"
+                                    })
+                                }
+                            ).catch(
+                                () => {
+                                    res.json({
+                                        "messge": "Password update failed"
+                                    })
+                                }
+                            )
+                        }
+
+                    }
+                    else {
+                        res.status(500).json({ message: 'User not found' })
+                    }
+                }
+            )
+            .catch(
+                (err) => {
+                    if (err) {
+                        res.status(err.status).json({ message: err.message })
+                    }
+                }
+            )
+    }
+    else {
+        res.status(500).json({ message: "Password must contain 6 characters" })
+    }
 }
 
 
@@ -511,6 +568,7 @@ function sendPasswordResetEmail(email, verificationLink) {
             throw new Error("Failed to send verification email");
         });
 }
+
 
 
 
