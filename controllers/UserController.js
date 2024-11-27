@@ -10,6 +10,14 @@ dotenv.config()
 
 
 export function getUsers(req, res) {
+
+    
+    const authenticated = authenticateAdmin(req, res, "You don't have permission to get user list")
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    
     User.find().then(
         (usersList) => {
             res.json({
