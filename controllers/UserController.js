@@ -369,8 +369,6 @@ export function requestVerification(req, res) {
     // Check if email already exists
     User.findOne({ email: user.email }).then(
         (existingUser) => {
-
-
             if (existingUser && existingUser.emailVerified == false) {
 
                 const token = jwt.sign(
@@ -459,19 +457,23 @@ export function resetPassword(req, res) {
                         }
                         else {
 
-                            const hashNewPassword = encryptPassword(credentials.password)
+                            const hashNewPassword = encryptPassword(password)
 
                             User.findOneAndUpdate({ email: decoded.email },
                                 {'password': hashNewPassword}
                             ).then(
                                 () => {
+
+                                    const loginLink = process.env.CLIENT_APP_URL + `/login`;
+                                    sendPasswordChangedNotification(decoded.email, loginLink)
+
                                     res.json({
                                         "messge": "Password changed!"
                                     })
                                 }
                             ).catch(
                                 () => {
-                                    res.json({
+                                    res.status(500).json({
                                         "messge": "Password update failed"
                                     })
                                 }
@@ -487,7 +489,7 @@ export function resetPassword(req, res) {
             .catch(
                 (err) => {
                     if (err) {
-                        res.status(err.status).json({ message: err.message })
+                        res.status(500).json({ message: err.message })
                     }
                 }
             )
@@ -569,6 +571,32 @@ function sendPasswordResetEmail(email, verificationLink) {
         });
 }
 
+function sendPasswordChangedNotification(email, loginLink) {
 
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your password changed",
+        html: `<p>Click the link below to login with your new password:</p>
+            <a href="${loginLink}">${loginLink}</a>`,
+    };
+
+    return transporter.sendMail(mailOptions)
+        .then(info => {
+            console.log("Verification email sent:", info.response);
+        })
+        .catch(err => {
+            console.error("Error sending email:", err);
+            throw new Error("Failed to send verification email");
+        });
+}
 
 
