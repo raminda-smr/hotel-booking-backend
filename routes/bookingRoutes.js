@@ -1,11 +1,13 @@
 import express from "express"
-import { createBooking, deleteBooking, getBookings, updateBooking, getBookingById } from "../controllers/BookingController.js"
+import { createBooking, deleteBooking, getBookings, updateBooking, getBookingById, getAvailableRooms } from "../controllers/BookingController.js"
 let bookingRoutes = express.Router()
 
 
 bookingRoutes.post("/", createBooking)
 
 bookingRoutes.get("/", getBookings)
+
+bookingRoutes.post("/get-available-rooms", getAvailableRooms)
 
 bookingRoutes.get("/:bookingId", getBookingById)
 

@@ -172,3 +172,7 @@ export function getBookingById(req, res) {
     )
 
 }
+
+export function getAvailableRooms(req, res){
+
+}
