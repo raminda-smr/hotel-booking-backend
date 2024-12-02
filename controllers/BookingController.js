@@ -49,6 +49,25 @@ export function createBooking(req, res) {
 
 }
 
+export function createBookings(req, res){
+    // loop room list
+        // check each room availablity for given date
+
+    // if all rooms are available
+        //loop room list
+            // add each booking
+    
+        // send booking email
+        // set admin notification
+        // send success code to clear the booking
+
+    // else send error with unavailable room message
+
+
+}
+
+
+
 export function getBookings(req, res) {
 
     Booking.find().then(
@@ -197,7 +216,7 @@ export function getAvailableRooms(req, res) {
                 ]
             });
 
-            const bookedRoomIds = overlappingBookings.map(booking => booking.roomId);
+            const bookedRoomIds = overlappingBookings.map(booking => booking.roomId)
 
             const rooms = await Room.find({
                 category: category,
@@ -241,5 +260,5 @@ export function getAvailableRooms(req, res) {
             if (error) {
                 res.status(500).json({ error: "Error fetching data" })
             }
-        });
+        })
 }
