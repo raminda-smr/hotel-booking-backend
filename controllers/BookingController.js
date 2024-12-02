@@ -63,7 +63,7 @@ export function createBookings(req, res){
 
     // else send error with unavailable room message
 
-
+    res.json(req.body)
 }
 
 
