@@ -1,10 +1,12 @@
 import Booking from "../models/Booking.js"
+import Room from "../models/Room.js"
+import Category from "../models/Category.js"
 import { authenticateAdmin, authenticateCustomer } from '../helpers/Authenticate.js'
 
 export function createBooking(req, res) {
 
-    const authenticated =  authenticateCustomer(req, res, "You must login as a customer to create a booking!")
-    if(!authenticated){
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to create a booking!")
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -47,6 +49,79 @@ export function createBooking(req, res) {
 
 }
 
+export function createBookings(req, res) {
+    // Authenticate the customer
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to create a booking!");
+    if (!authenticated) {
+        return; // Stop processing
+    }
+
+    // Extract data from the request body
+    const { startDate, endDate, cart } = req.body;
+    const user = req.user;
+
+    if (!startDate || !endDate || !Array.isArray(cart) || cart.length === 0) {
+        return res.status(400).json({ error: "Invalid booking data!" });
+    }
+
+    // Convert startDate and endDate to Date objects
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Check room availability
+    Booking.find({
+        roomId: { $in: cart },
+        $or: [
+            { start: { $lt: end }, end: { $gt: start } } // Overlapping bookings
+        ]
+    })
+        .then((existingBookings) => {
+            if (existingBookings.length > 0) {
+                // Find unavailable rooms
+                const unavailableRooms = existingBookings.map(booking => booking.roomId);
+                return res.status(400).json({
+                    error: "Some rooms are not available for the selected dates.",
+                    unavailableRooms
+                });
+            }
+
+            // Generate booking entries
+            let startingId = 1201;
+            return Booking.countDocuments({})
+                .then((count) => {
+                    const newBookingId = count + startingId;
+                    const bookings = cart.map((roomId, index) => ({
+                        bookingId: newBookingId + index,
+                        roomId,
+                        email: user.email,
+                        start,
+                        end,
+                        status: "pending"
+                    }));
+
+                    // Save all bookings
+                    return Booking.insertMany(bookings);
+                })
+                .then((createdBookings) => {
+                    // Send booking email (Placeholder)
+                    console.log(`Email sent to ${user.email} for bookings:`, createdBookings);
+
+                    // Notify admin (Placeholder)
+                    console.log("Admin notified about new bookings:", createdBookings);
+
+                    // Respond with success
+                    res.status(201).json({ message: "Booking successful!", bookings: createdBookings });
+                });
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).json({ error: "An error occurred while processing the booking." });
+        });
+}
+
+
+
+
 export function getBookings(req, res) {
 
     Booking.find().then(
@@ -63,7 +138,7 @@ export function getBookings(req, res) {
 export function updateBooking(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You must login as a admin to update a booking!")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -103,52 +178,44 @@ export function updateBooking(req, res) {
 
 
 export function deleteBooking(req, res) {
-    const authenticated = authenticateAdmin(req, res, "You must login as a admin to update a booking!")
-    if(!authenticated){
-        return // stop processing
+    // Authenticate admin
+    const authenticated = authenticateAdmin(req, res, "You must login as an admin to delete a booking!");
+    if (!authenticated) {
+        return; // Stop processing
     }
 
-    const bookingId = req.params.bookingId
+    // Get bookingId from request parameters
+    const bookingId = req.params.bookingId;
 
-    const booking = {
-        status: "deleted"
-    }
-
-    Booking.findOneAndUpdate({ bookingId: bookingId }, booking).then(
-        (result) => {
+    // Find and delete the booking
+    Booking.findOneAndDelete({ bookingId: bookingId })
+        .then((result) => {
             if (result) {
                 res.json({
-                    message: "Booking item deleted",
-                    result: result
-                })
+                    message: "Booking item deleted successfully",
+                    deletedBooking: result
+                });
+            } else {
+                res.status(404).json({
+                    message: "Booking item not found"
+                });
             }
-            else {
-                res.status(500).json({
-                    message: "Booking item notfound"
-                })
-            }
-        }
-    ).catch(
-        (err) => {
-            if (err) {
-                res.status(500).json({
-                    message: "Booking item delete failed",
-                    error: err
-                })
-            }
-        }
-    )
-
+        })
+        .catch((err) => {
+            res.status(500).json({
+                message: "Failed to delete the booking item",
+                error: err
+            });
+        });
 }
-
 
 export function getBookingById(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You must login as a admin to read a booking!")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
-    
+
     const bookingId = req.params.bookingId
 
     Booking.findOne({ bookingId: bookingId }).then(
@@ -161,8 +228,8 @@ export function getBookingById(req, res) {
             }
         }
     ).catch(
-        (err) =>{
-            if(err){
+        (err) => {
+            if (err) {
                 res.status(500).json({
                     message: "Booking not found",
                     booking: err
@@ -171,4 +238,73 @@ export function getBookingById(req, res) {
         }
     )
 
+}
+
+export function getAvailableRooms(req, res) {
+
+    const { start, end, category } = req.body
+
+    if (!start || !end || !category) {
+        return res.status(400).json({ message: "Start date, end date, and category are required." });
+    }
+
+    const getAvailableRoomData = async () => {
+
+        try {
+
+            const startDate = new Date(start)
+            const endDate = new Date(end)
+
+            const overlappingBookings = await Booking.find({
+                $or: [
+                    { start: { $lt: endDate }, end: { $gt: startDate } }, // Overlaps partially
+                    { start: { $lte: startDate }, end: { $gte: endDate } } // Fully contained
+                ]
+            });
+
+            const bookedRoomIds = overlappingBookings.map(booking => booking.roomId)
+
+            const rooms = await Room.find({
+                category: category,
+                disabled: false, // makesure room is not disabled
+                roomNumber: { $nin: bookedRoomIds } // exclude booked rooms
+            })
+
+            if (rooms.length === 0) {
+                return { rooms: [] }
+            }
+
+            // get category data from db
+            const categoryDetails = await Category.findOne({ name: category });
+
+            if (categoryDetails) {
+
+                const availableRooms = rooms.map(room => ({
+                    ...room.toObject(), // Convert Mongoose document to plain object
+                    category: categoryDetails
+                }))
+
+                return { rooms: availableRooms }
+            }
+
+            return { rooms: [] }
+        }
+        catch (e) {
+            console.error(e)
+            throw e
+        }
+
+    }
+
+    getAvailableRoomData()
+        .then((data) => {
+            if (data) {
+                res.json(data)
+            }
+        })
+        .catch((error) => {
+            if (error) {
+                res.status(500).json({ error: "Error fetching data" })
+            }
+        })
 }

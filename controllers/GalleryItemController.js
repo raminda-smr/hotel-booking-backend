@@ -4,7 +4,7 @@ import { authenticateAdmin } from "../helpers/Authenticate.js";
 export function createGalleryItem(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You don't have permission to create gallery item")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
@@ -32,36 +32,40 @@ export function createGalleryItem(req, res) {
 
 export function getGalleryItems(req, res) {
 
-    GalleryItem.find().then(
-        (list) => {
-            res.json({
-                list: list
-            })
-        }
-    )
+    const limit = req.query && req.query.limit ? req.query.limit : 10
+
+    GalleryItem.find()
+        .limit(limit)
+        .then(
+            (list) => {
+                res.json({
+                    list: list
+                })
+            }
+        )
 }
 
-export function updateGalleryItem(req, res){
+export function updateGalleryItem(req, res) {
     const authenticated = authenticateAdmin(req, res, "You don't have permission to update a gallery item")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
     const id = req.params.id
     const galleryItem = req.body
 
-    GalleryItem.findOneAndUpdate({_id:id},galleryItem ).then(
+    GalleryItem.findOneAndUpdate({ _id: id }, galleryItem).then(
         (result) => {
-            if(result){
+            if (result) {
                 res.json({
                     "message": "Gallery item updated!",
                 })
             }
-            
+
         }
     ).catch(
         (err) => {
-            if(err != undefined){
+            if (err != undefined) {
                 res.json({
                     "message": "Gallery item update failed!",
                 })
@@ -73,24 +77,24 @@ export function updateGalleryItem(req, res){
 }
 
 
-export function deleteGalleryItem(req, res){
-    
+export function deleteGalleryItem(req, res) {
+
     const authenticated = authenticateAdmin(req, res, "You don't have permission to delete a gallery item")
-    if(!authenticated){
+    if (!authenticated) {
         return // stop processing
     }
 
     const id = req.params.id
 
-    GalleryItem.findOneAndDelete({_id:id}).then(
-        ()=>{
+    GalleryItem.findOneAndDelete({ _id: id }).then(
+        () => {
             res.json({
                 "message": "Gallery item deleted"
             })
         }
     ).catch(
-        (err)=>{
-            if(err != undefined){
+        (err) => {
+            if (err != undefined) {
                 res.json({
                     "message": "Gallery item deletation failed"
                 })

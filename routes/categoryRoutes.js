@@ -1,10 +1,12 @@
 import express from "express";
-import {getCategoryList, postCategory, deleteCategory, getCategoryByName, getCategoryByPrice, updateCategory} from '../controllers/CategoryController.js'
+import {getCategoryList, postCategory, deleteCategory, getCategoryByName, getCategoryByPrice, updateCategory, getCategoryListWithRooms} from '../controllers/CategoryController.js'
 
 
 let categoryRoutes = express.Router()
 
 categoryRoutes.get('/', getCategoryList)
+
+categoryRoutes.get('/with-rooms', getCategoryListWithRooms)
 
 categoryRoutes.post('/', postCategory)
 

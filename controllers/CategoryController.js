@@ -1,5 +1,6 @@
 import Category from '../models/Category.js'
 import { authenticateAdmin } from '../helpers/Authenticate.js'
+import Room from '../models/Room.js'
 
 export function postCategory(req, res) {
 
@@ -108,6 +109,35 @@ export function getCategoryList(req, res) {
             })
         }
     )
+}
+
+export function getCategoryListWithRooms(req, res) {
+
+    async function getData(req, res){
+        try {
+            const list = await Category.find() // Get all categories
+            
+            if (list) {
+                // Use Promise.all to resolve all room queries
+                const updatedList = await Promise.all(
+                    list.map(async (category) => {
+                        const rooms = await Room.find({ category: category.name })
+                        return { ...category._doc, rooms } // Include `rooms` in the category data
+                    })
+                )
+    
+                return res.json({ list: updatedList })
+            }
+    
+            res.json({ list: [] }) // If no categories found, return an empty list
+        } catch (error) {
+            // console.error("Error fetching categories with rooms:", error)
+            res.status(500).json({ error: "An error occurred while fetching data." });
+        }
+    }
+
+    getData(req, res)
+   
 }
 
 
