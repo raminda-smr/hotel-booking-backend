@@ -49,22 +49,76 @@ export function createBooking(req, res) {
 
 }
 
-export function createBookings(req, res){
-    // loop room list
-        // check each room availablity for given date
+export function createBookings(req, res) {
+    // Authenticate the customer
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to create a booking!");
+    if (!authenticated) {
+        return; // Stop processing
+    }
 
-    // if all rooms are available
-        //loop room list
-            // add each booking
-    
-        // send booking email
-        // set admin notification
-        // send success code to clear the booking
+    // Extract data from the request body
+    const { startDate, endDate, cart } = req.body;
+    const user = req.user;
 
-    // else send error with unavailable room message
+    if (!startDate || !endDate || !Array.isArray(cart) || cart.length === 0) {
+        return res.status(400).json({ error: "Invalid booking data!" });
+    }
 
-    res.json(req.body)
+    // Convert startDate and endDate to Date objects
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Check room availability
+    Booking.find({
+        roomId: { $in: cart },
+        $or: [
+            { start: { $lt: end }, end: { $gt: start } } // Overlapping bookings
+        ]
+    })
+    .then((existingBookings) => {
+        if (existingBookings.length > 0) {
+            // Find unavailable rooms
+            const unavailableRooms = existingBookings.map(booking => booking.roomId);
+            return res.status(400).json({ 
+                error: "Some rooms are not available for the selected dates.",
+                unavailableRooms 
+            });
+        }
+
+        // Generate booking entries
+        let startingId = 1201;
+        return Booking.countDocuments({})
+            .then((count) => {
+                const newBookingId = count + startingId;
+                const bookings = cart.map((roomId, index) => ({
+                    bookingId: newBookingId + index,
+                    roomId,
+                    email: user.email,
+                    start,
+                    end,
+                    status: "pending"
+                }));
+
+                // Save all bookings
+                return Booking.insertMany(bookings);
+            })
+            .then((createdBookings) => {
+                // Send booking email (Placeholder)
+                console.log(`Email sent to ${user.email} for bookings:`, createdBookings);
+
+                // Notify admin (Placeholder)
+                console.log("Admin notified about new bookings:", createdBookings);
+
+                // Respond with success
+                res.status(201).json({ message: "Booking successful!", bookings: createdBookings });
+            });
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "An error occurred while processing the booking." });
+    });
 }
+
 
 
 
