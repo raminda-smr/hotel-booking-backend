@@ -44,7 +44,11 @@ export function createFeedback(req, res) {
 
 export function getFeedbacks(req, res) {
 
-    Feedback.find().then(
+    const limit = req.query && req.query.limit ? req.query.limit : 10
+
+    Feedback.find()
+        .limit(limit)
+        .then(
         (list) => {
             res.json({
                 list: list
