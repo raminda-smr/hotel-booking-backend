@@ -9,7 +9,7 @@ export function authenticateCustomer(req,res, message){
     return authenticateUser(req, res, message, 'customer')
 }
 
-export function authenticateAnyUser(req,res, message){
+export function authenticateAnyUser(req,res){
 
     const user = req.user
     let userAuthenticated = true;
