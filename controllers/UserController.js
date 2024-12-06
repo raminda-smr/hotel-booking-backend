@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import nodemailer from "nodemailer";
 
-import { authenticateAdmin } from "../helpers/Authenticate.js"
+import { authenticateAdmin, authenticateAnyUser } from "../helpers/Authenticate.js"
 
 dotenv.config()
 
@@ -547,7 +547,7 @@ export function getUserProfile(req, res){
 
     const loggedUser = req.user
 
-    User.find({ email: loggedUser.email }).then(
+    User.findOne({ email: loggedUser.email }).then(
         (user) => {
             if(user != null){
                 user.password = ""
@@ -569,6 +569,44 @@ export function getUserProfile(req, res){
         }
     )
 
+}
+
+
+export function updateUserProfile(req, res){
+    const authenticated = authenticateAnyUser(req, res)
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    const loggedUser = req.user
+    const user = req.body
+
+    if(!user.img){
+        // reset image to old one
+        user.img = loggedUser.img
+    }
+
+    User.findOneAndUpdate({ email: loggedUser.email },user).then(
+        (user) => {
+            if(user != null){
+                user.password = ""
+
+                res.json({
+                    message: "Profile updated",
+                    user: user
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.status(500).json({
+                    message: "User update failed",
+                    err: err.message
+                })
+            }
+        }
+    )
 }
 
 
