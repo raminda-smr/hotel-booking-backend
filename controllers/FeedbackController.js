@@ -9,9 +9,19 @@ export function createFeedback(req, res) {
         return // stop processing
     }
 
+    const loggedUser = req.user
     const feedback = req.body
 
-    const newFeedback = new Feedback(feedback)
+    const feedbackData = {
+        email: loggedUser.email,
+        username: loggedUser.firstName + " " + loggedUser.lastName,
+        title: feedback.title,
+        rating: feedback.rating,
+        description: feedback.description,
+    }
+
+
+    const newFeedback = new Feedback(feedbackData)
 
     newFeedback.save().then(
         (result) => {
@@ -44,6 +54,11 @@ export function createFeedback(req, res) {
 
 export function getFeedbacks(req, res) {
 
+    const authenticated =  authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
+    if(!authenticated){
+        return // stop processing
+    }
+
     const limit = req.query && req.query.limit ? req.query.limit : 10
 
     Feedback.find()
@@ -58,6 +73,37 @@ export function getFeedbacks(req, res) {
 
 }
 
+export function getPublicFeedbacks(req, res) {
+
+
+    const limit = req.query && req.query.limit ? req.query.limit : 10
+
+    Feedback.find({ approved: true })
+        .limit(limit)
+        .then(async (feedbacks) => {
+            // For each feedback, fetch the corresponding user data
+            const feedbacksWithUserImage = await Promise.all(
+                feedbacks.map(async (feedback) => {
+                    const user = await User.findOne({ email: feedback.email }).select('img');
+                    return {
+                        ...feedback.toObject(), // Convert Mongoose document to plain object
+                        userImage: user ? user.img : null // Add userImage field
+                    }
+                })
+            );
+
+            res.json({
+                list: feedbacksWithUserImage
+            })
+        })
+        .catch((err) => {
+            res.status(500).json({
+                message: err.message
+            })
+        })
+
+}
+
 export function getFeedbackById(req, res) {
 
     const authenticated = authenticateAdmin(req, res, "You must login as a admin to view a feedback!")
@@ -68,6 +114,39 @@ export function getFeedbackById(req, res) {
     const feedbackId = req.params.feedback
 
     Feedback.findOne({ _id: feedbackId }).then(
+        (feedback) => {
+
+            if (feedback) {
+                res.json({
+                    message: "Feedback found",
+                    feedback: feedback,
+                })
+            }
+
+        }
+    ).catch(
+        (err) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Feedback not found",
+                    error: err
+                })
+            }
+        }
+    )
+}
+
+export function getCustomerFeedbackById(req, res) {
+
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to view a feedback!")
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    const feedbackId = req.params.feedback
+    const loggedUser = req.user
+
+    Feedback.findOne({ _id: feedbackId, email: loggedUser.email }).then(
         (feedback) => {
 
             if (feedback) {
@@ -150,6 +229,42 @@ export function deleteFeedback(req, res) {
                     "message": "Feedback deletation failed"
                 })
             }
+        }
+    )
+}
+
+
+export function getCustomerFeedbacks(req,res){
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
+    if(!authenticated){
+        return
+    }
+
+    const loggedUser = req.user
+
+    // Define the query condition
+    let queryCondition = { email: loggedUser.email };
+
+    Feedback.find(queryCondition)
+    .sort({ date: -1 })
+    .then(
+        (result)=>{
+            if(result){
+                // console.log(result)
+                res.json({
+                    message:"Feedbacks found",
+                    list: result || [] 
+                })
+            }
+        }
+    ).catch(
+        (err) =>{
+            if(err){
+                res.status(500).json({
+                    message:err.message
+                })
+            }
+           
         }
     )
 }

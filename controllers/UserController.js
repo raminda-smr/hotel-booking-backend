@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import nodemailer from "nodemailer";
 
-import { authenticateAdmin } from "../helpers/Authenticate.js"
+import { authenticateAdmin, authenticateAnyUser } from "../helpers/Authenticate.js"
 
 dotenv.config()
 
@@ -304,6 +304,12 @@ export function loginUser(req, res) {
 }
 
 export function getUser(req, res) {
+
+    const authenticated = authenticateAnyUser(req, res)
+    if (!authenticated) {
+        return // stop processing
+    }
+
     const user = req.user
 
     if (user == null) {
@@ -530,6 +536,79 @@ export function resetPassword(req, res) {
         res.status(500).json({ message: "Password must contain 6 characters" })
     }
 }
+
+
+export function getUserProfile(req, res){
+    
+    const authenticated = authenticateAnyUser(req, res)
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    const loggedUser = req.user
+
+    User.findOne({ email: loggedUser.email }).then(
+        (user) => {
+            if(user != null){
+                user.password = ""
+
+                res.json({
+                    message: "Profile Found",
+                    user: user
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.status(500).json({
+                    message: "Not found",
+                    err: err.message
+                })
+            }
+        }
+    )
+
+}
+
+
+export function updateUserProfile(req, res){
+    const authenticated = authenticateAnyUser(req, res)
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    const loggedUser = req.user
+    const user = req.body
+
+    if(!user.img){
+        // reset image to old one
+        user.img = loggedUser.img
+    }
+
+    User.findOneAndUpdate({ email: loggedUser.email },user).then(
+        (user) => {
+            if(user != null){
+                user.password = ""
+
+                res.json({
+                    message: "Profile updated",
+                    user: user
+                })
+            }
+        }
+    ).catch(
+        (err)=>{
+            if(err){
+                res.status(500).json({
+                    message: "User update failed",
+                    err: err.message
+                })
+            }
+        }
+    )
+}
+
 
 
 /* ----------------------------------------- */

@@ -308,3 +308,89 @@ export function getAvailableRooms(req, res) {
             }
         })
 }
+
+
+export function getCustomerBookings(req,res){
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
+    if(!authenticated){
+        return
+    }
+
+    const loggedUser = req.user
+    const {type} = req.params
+    let status = "pending"
+
+    const statuses = ['pending','approved','paid','completed','canceled']
+
+    if(statuses.includes(type)){
+        status = type
+    }
+
+    // Define the query condition
+    let queryCondition = { email: loggedUser.email, status };
+
+    // If type is 'approved', modify the condition to include both 'approved' and 'paid'
+    if (type === 'approved') {
+        queryCondition = {
+            email: loggedUser.email,
+            status: { $in: ['approved', 'paid'] } // Query for both 'approved' and 'paid'
+        };
+    }
+
+    Booking.find(queryCondition).then(
+        (result)=>{
+            if(result){
+                // console.log(result)
+                res.json({
+                    message:"Bookings found",
+                    list: result || [] 
+                })
+            }
+        }
+    ).catch(
+        (err) =>{
+            if(err){
+                res.status(500).json({
+                    message:err.message
+                })
+            }
+           
+        }
+    )
+    
+}
+
+
+export function getCustomerBookingById(req,res){
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
+    if(!authenticated){
+        return
+    }
+
+    const loggedUser = req.user
+    const {bookingId} = req.params
+
+    const queryCondition = { email: loggedUser.email, bookingId };
+
+    Booking.findOne(queryCondition).then(
+        (result)=>{
+            if(result){
+                // console.log(result)
+                res.json({
+                    message:"Booking found",
+                    booking: result  
+                })
+            }
+        }
+    ).catch(
+        (err) =>{
+            if(err){
+                res.status(500).json({
+                    message:err.message
+                })
+            }
+           
+        }
+    )
+    
+}
