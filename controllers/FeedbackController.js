@@ -54,6 +54,11 @@ export function createFeedback(req, res) {
 
 export function getFeedbacks(req, res) {
 
+    const authenticated =  authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
+    if(!authenticated){
+        return // stop processing
+    }
+
     const limit = req.query && req.query.limit ? req.query.limit : 10
 
     Feedback.find()
@@ -65,6 +70,37 @@ export function getFeedbacks(req, res) {
             })
         }
     )
+
+}
+
+export function getPublicFeedbacks(req, res) {
+
+
+    const limit = req.query && req.query.limit ? req.query.limit : 10
+
+    Feedback.find({ approved: true })
+        .limit(limit)
+        .then(async (feedbacks) => {
+            // For each feedback, fetch the corresponding user data
+            const feedbacksWithUserImage = await Promise.all(
+                feedbacks.map(async (feedback) => {
+                    const user = await User.findOne({ email: feedback.email }).select('img');
+                    return {
+                        ...feedback.toObject(), // Convert Mongoose document to plain object
+                        userImage: user ? user.img : null // Add userImage field
+                    }
+                })
+            );
+
+            res.json({
+                list: feedbacksWithUserImage
+            })
+        })
+        .catch((err) => {
+            res.status(500).json({
+                message: err.message
+            })
+        })
 
 }
 
@@ -176,7 +212,9 @@ export function getCustomerFeedbacks(req,res){
     // Define the query condition
     let queryCondition = { email: loggedUser.email };
 
-    Feedback.find(queryCondition).then(
+    Feedback.find(queryCondition)
+    .sort({ date: -1 })
+    .then(
         (result)=>{
             if(result){
                 // console.log(result)
