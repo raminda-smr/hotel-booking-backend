@@ -136,6 +136,39 @@ export function getFeedbackById(req, res) {
     )
 }
 
+export function getCustomerFeedbackById(req, res) {
+
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to view a feedback!")
+    if (!authenticated) {
+        return // stop processing
+    }
+
+    const feedbackId = req.params.feedback
+    const loggedUser = req.user
+
+    Feedback.findOne({ _id: feedbackId, email: loggedUser.email }).then(
+        (feedback) => {
+
+            if (feedback) {
+                res.json({
+                    message: "Feedback found",
+                    feedback: feedback,
+                })
+            }
+
+        }
+    ).catch(
+        (err) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Feedback not found",
+                    error: err
+                })
+            }
+        }
+    )
+}
+
 export function updateFeedback(req, res) {
 
     const authenticated =  authenticateAdmin(req, res, "You must login as a admin to update a feedback!")
