@@ -9,9 +9,19 @@ export function createFeedback(req, res) {
         return // stop processing
     }
 
+    const loggedUser = req.user
     const feedback = req.body
 
-    const newFeedback = new Feedback(feedback)
+    const feedbackData = {
+        email: loggedUser.email,
+        username: loggedUser.firstName + " " + loggedUser.lastName,
+        title: feedback.title,
+        rating: feedback.rating,
+        description: feedback.description,
+    }
+
+
+    const newFeedback = new Feedback(feedbackData)
 
     newFeedback.save().then(
         (result) => {
@@ -150,6 +160,40 @@ export function deleteFeedback(req, res) {
                     "message": "Feedback deletation failed"
                 })
             }
+        }
+    )
+}
+
+
+export function getCustomerFeedbacks(req,res){
+    const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
+    if(!authenticated){
+        return
+    }
+
+    const loggedUser = req.user
+
+    // Define the query condition
+    let queryCondition = { email: loggedUser.email };
+
+    Feedback.find(queryCondition).then(
+        (result)=>{
+            if(result){
+                // console.log(result)
+                res.json({
+                    message:"Feedbacks found",
+                    list: result || [] 
+                })
+            }
+        }
+    ).catch(
+        (err) =>{
+            if(err){
+                res.status(500).json({
+                    message:err.message
+                })
+            }
+           
         }
     )
 }

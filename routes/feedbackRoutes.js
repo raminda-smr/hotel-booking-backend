@@ -1,5 +1,5 @@
 import express from 'express'
-import { createFeedback, deleteFeedback, getFeedbacks, updateFeedback, getFeedbackById } from '../controllers/FeedbackController.js'
+import { createFeedback, deleteFeedback, getFeedbacks, updateFeedback, getFeedbackById, getCustomerFeedbacks } from '../controllers/FeedbackController.js'
 
 
 let feedbackRoutes = express.Router()
@@ -7,6 +7,10 @@ let feedbackRoutes = express.Router()
 feedbackRoutes.get("/", getFeedbacks)
 
 feedbackRoutes.post("/", createFeedback)
+
+feedbackRoutes.get("/customer", getCustomerFeedbacks)
+
+feedbackRoutes.get("/customer/:feedback", getFeedbackById)
 
 feedbackRoutes.get("/:feedback", getFeedbackById)
 
