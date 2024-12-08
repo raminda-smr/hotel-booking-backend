@@ -1,7 +1,7 @@
 const config = {
 
     pagination:{
-        perPage: 2,
+        perPage: 10,
         pageGap: 2
     }
 
