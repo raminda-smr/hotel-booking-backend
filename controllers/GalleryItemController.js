@@ -1,5 +1,7 @@
 import GalleryItem from "../models/GalleryItem.js";
 import { authenticateAdmin } from "../helpers/Authenticate.js";
+import { generatePagination } from "../helpers/Paginate.js";
+import config from "../config/config.js";
 
 export function createGalleryItem(req, res) {
 
@@ -32,17 +34,29 @@ export function createGalleryItem(req, res) {
 
 export function getGalleryItems(req, res) {
 
-    const limit = req.query && req.query.limit ? req.query.limit : 10
+    const perPage = req.query.limit || config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
 
-    GalleryItem.find()
-        .limit(limit)
-        .then(
-            (list) => {
-                res.json({
-                    list: list
+    GalleryItem.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return GalleryItem.find()
+                .sort({ name: -1 })
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(list => {
+                    res.json({
+                        list,
+                        pagination
+                    })
                 })
-            }
-        )
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to fetch gallery items", details: err.message })
+        })
+    
 }
 
 export function updateGalleryItem(req, res) {

@@ -1,16 +1,18 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import cors from 'cors'
+
 import userRoutes from './routes/userRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import roomRoutes from './routes/roomRoutes.js'
-import mongoose from 'mongoose'
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
 import bookingRoutes from './routes/bookingRoutes.js'
 import feedbackRoutes from './routes/feedbackRoutes.js'
 import statsRoutes from './routes/statsRoutes.js'
-import cors from "cors"
+
 
 dotenv.config()
 

@@ -2,6 +2,8 @@ import Booking from "../models/Booking.js"
 import Room from "../models/Room.js"
 import Category from "../models/Category.js"
 import { authenticateAdmin, authenticateCustomer } from '../helpers/Authenticate.js'
+import config from "../config/config.js"
+import { generatePagination } from "../helpers/Paginate.js"
 
 export function createBooking(req, res) {
 
@@ -123,15 +125,35 @@ export function createBookings(req, res) {
 
 
 export function getBookings(req, res) {
+    const authenticated = authenticateAdmin(req, res, "You must login as a admin to get bookings list!")
+    if (!authenticated) {
+        return // stop processing
+    }
 
-    Booking.find().then(
-        (list) => {
-            res.json({
-                list: list
-            })
-        }
-    )
+    const perPage = config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
 
+    Booking.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return Booking.find()
+                .sort({ bookingId: -1 })
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(
+                    (list) => {
+                        res.json({
+                            list,
+                            pagination
+                        })
+                    }
+                )
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to get bookings", details: err.message })
+        })
 }
 
 
@@ -310,19 +332,19 @@ export function getAvailableRooms(req, res) {
 }
 
 
-export function getCustomerBookings(req,res){
+export function getCustomerBookings(req, res) {
     const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
-    if(!authenticated){
+    if (!authenticated) {
         return
     }
 
     const loggedUser = req.user
-    const {type} = req.params
+    const { type } = req.params
     let status = "pending"
 
-    const statuses = ['pending','approved','paid','completed','canceled']
+    const statuses = ['pending', 'approved', 'paid', 'completed', 'canceled']
 
-    if(statuses.includes(type)){
+    if (statuses.includes(type)) {
         status = type
     }
 
@@ -338,59 +360,59 @@ export function getCustomerBookings(req,res){
     }
 
     Booking.find(queryCondition).then(
-        (result)=>{
-            if(result){
+        (result) => {
+            if (result) {
                 // console.log(result)
                 res.json({
-                    message:"Bookings found",
-                    list: result || [] 
+                    message: "Bookings found",
+                    list: result || []
                 })
             }
         }
     ).catch(
-        (err) =>{
-            if(err){
+        (err) => {
+            if (err) {
                 res.status(500).json({
-                    message:err.message
+                    message: err.message
                 })
             }
-           
+
         }
     )
-    
+
 }
 
 
-export function getCustomerBookingById(req,res){
+export function getCustomerBookingById(req, res) {
     const authenticated = authenticateCustomer(req, res, "You must login as a customer to get this data")
-    if(!authenticated){
+    if (!authenticated) {
         return
     }
 
     const loggedUser = req.user
-    const {bookingId} = req.params
+    const { bookingId } = req.params
 
     const queryCondition = { email: loggedUser.email, bookingId };
 
     Booking.findOne(queryCondition).then(
-        (result)=>{
-            if(result){
+        (result) => {
+            if (result) {
                 // console.log(result)
                 res.json({
-                    message:"Booking found",
-                    booking: result  
+                    message: "Booking found",
+                    booking: result
                 })
             }
         }
     ).catch(
-        (err) =>{
-            if(err){
+        (err) => {
+            if (err) {
                 res.status(500).json({
-                    message:err.message
+                    message: err.message
                 })
             }
-           
+
         }
     )
-    
+
 }

@@ -1,5 +1,7 @@
 import Room from "../models/Room.js"
 import { authenticateAdmin } from "../helpers/Authenticate.js";
+import config from "../config/config.js";
+import { generatePagination } from "../helpers/Paginate.js";
 
 export function createRoom(req, res) {
 
@@ -37,13 +39,29 @@ export function createRoom(req, res) {
 
 export function getRooms(req, res) {
 
-    Room.find().then(
-        (list) => {
-            res.json({
-                list: list
-            })
-        }
-    )
+    const perPage = config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
+
+    Room.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return Room.find()
+                .sort({ roomNumber: -1 })
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(list => {
+                    res.json({
+                        list,
+                        pagination
+                    })
+                })
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to fetch rooms", details: err.message })
+        })
+   
 }
 
 export function getRoomByCategory(req, res) {

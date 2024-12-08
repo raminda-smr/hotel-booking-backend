@@ -5,26 +5,43 @@ import dotenv from 'dotenv'
 import nodemailer from "nodemailer";
 
 import { authenticateAdmin, authenticateAnyUser } from "../helpers/Authenticate.js"
+import config from '../config/config.js';
+import { generatePagination } from '../helpers/Paginate.js';
 
 dotenv.config()
 
 
 export function getUsers(req, res) {
 
-    
     const authenticated = authenticateAdmin(req, res, "You don't have permission to get user list")
     if (!authenticated) {
         return // stop processing
     }
 
+    const perPage = config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
+
+    User.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return User.find()
+                .sort({ email: -1 })
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(list => {
+                    res.json({
+                        list,
+                        pagination
+                    })
+                })
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to fetch users", details: err.message })
+        })
     
-    User.find().then(
-        (usersList) => {
-            res.json({
-                'list': usersList
-            })
-        }
-    )
+    
 }
 
 export function postUsers(req, res) {
