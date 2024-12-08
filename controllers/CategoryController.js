@@ -1,6 +1,8 @@
 import Category from '../models/Category.js'
 import { authenticateAdmin } from '../helpers/Authenticate.js'
 import Room from '../models/Room.js'
+import config from '../config/config.js'
+import { generatePagination } from '../helpers/Paginate.js'
 
 export function postCategory(req, res) {
 
@@ -102,13 +104,31 @@ export function updateCategory(req, res){
 
 export function getCategoryList(req, res) {
 
-    Category.find().then(
-        (list) => {
-            res.json({
-                list: list
-            })
-        }
-    )
+    const perPage = config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
+
+    Category.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return Category.find()
+                .sort({ name: -1 })
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(
+                    (list) => {
+                        res.json({
+                            list,
+                            pagination
+                        })
+                    }
+                )
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to get categories", details: err.message })
+        })
+
 }
 
 export function getCategoryListWithRooms(req, res) {
