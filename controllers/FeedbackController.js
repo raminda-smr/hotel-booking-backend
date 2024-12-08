@@ -1,6 +1,8 @@
 import { authenticateAdmin, authenticateCustomer } from "../helpers/Authenticate.js";
 import Feedback from "../models/Feedback.js";
 import User from './../models/User.js';
+import config from '../config/config.js'
+import { generatePagination } from "../helpers/Paginate.js";
 
 export function createFeedback(req, res) {
 
@@ -59,17 +61,27 @@ export function getFeedbacks(req, res) {
         return // stop processing
     }
 
-    const limit = req.query && req.query.limit ? req.query.limit : 10
+    const perPage = config.pagination.perPage || 10; // Default items per page
+    const pageGap = config.pagination.pageGap || 2; // Default page gap
+    const currentPage = parseInt(req.query.page) || 1; // Current page from query param
 
-    Feedback.find()
-        .limit(limit)
-        .then(
-        (list) => {
-            res.json({
-                list: list
-            })
-        }
-    )
+    Feedback.countDocuments()
+        .then(totalItems => {
+            const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
+
+            return Feedback.find()
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage)
+                .then(list => {
+                    res.json({
+                        list,
+                        pagination
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(500).json({ error: "Failed to fetch feedbacks", details: err.message });
+        });
 
 }
 
