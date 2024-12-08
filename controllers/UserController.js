@@ -2,7 +2,7 @@ import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
-import nodemailer from "nodemailer";
+import nodemailer from "nodemailer"
 
 import { authenticateAdmin, authenticateAnyUser } from "../helpers/Authenticate.js"
 import config from '../config/config.js';
