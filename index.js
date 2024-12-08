@@ -12,6 +12,7 @@ import roomRoutes from './routes/roomRoutes.js'
 import bookingRoutes from './routes/bookingRoutes.js'
 import feedbackRoutes from './routes/feedbackRoutes.js'
 import statsRoutes from './routes/statsRoutes.js'
+import publicRoutes from './routes/publicRoutes.js'
 
 
 dotenv.config()
@@ -82,6 +83,8 @@ app.use('/api/bookings', bookingRoutes)
 app.use('/api/feedbacks', feedbackRoutes)
 
 app.use('/api/stats', statsRoutes)
+
+app.use('/api/public', publicRoutes)
 
 // Run applicaion in given port
 app.listen(3000, (req,res)=>{

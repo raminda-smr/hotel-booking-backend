@@ -2,6 +2,7 @@ import Room from "../models/Room.js"
 import { authenticateAdmin } from "../helpers/Authenticate.js";
 import config from "../config/config.js";
 import { generatePagination } from "../helpers/Paginate.js";
+import Category from "../models/Category.js";
 
 export function createRoom(req, res) {
 
@@ -11,7 +12,6 @@ export function createRoom(req, res) {
     }
 
     const room = req.body
-
     const newRoom = new Room(room)
 
     newRoom.save().then(
@@ -81,7 +81,7 @@ export function getRoomByNumber(req, res) {
 
     const roomNumber = req.params.room
 
-    Room.findOne({ roomNumber: roomNumber }).then(
+    Room.findOne({ roomNumber: roomNumber, disabled: false }).then(
         (result) => {
             if (result == null) {
                 res.json({
@@ -89,9 +89,15 @@ export function getRoomByNumber(req, res) {
                 })
             }
             else {
-                res.json({
-                    room: result
-                })
+                Category.findOne({name: result.category}).then(
+                    (category) =>{
+                        res.json({
+                            room: {...result.toObject(),
+                                category: category
+                            },
+                        }) 
+                    }
+                )
             }
             return
         }
