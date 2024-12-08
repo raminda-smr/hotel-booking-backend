@@ -70,6 +70,7 @@ export function getFeedbacks(req, res) {
             const pagination = generatePagination(currentPage, totalItems, perPage, pageGap);
 
             return Feedback.find()
+                .sort({ date: -1 })
                 .skip((currentPage - 1) * perPage)
                 .limit(perPage)
                 .then(list => {
